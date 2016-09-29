@@ -32,6 +32,14 @@ class Test_test1(unittest.TestCase):
 
         with self.assertRaises(Exception):
             methods.choleskiFacotrization(inputMatrix, initialValueVector)
+        
+        testMatrix = np.array(([2,1],[1,2]))
+        testMatrix = testMatrix.dot(testMatrix.T)
+        inputMatrix = testMatrix
+        initialVector = np.array([1,1]).T
+        result = methods.choleskiFacotrization(inputMatrix, initialVector)
+        expected = np.linalg.cholesky(testMatrix)
+        self.assertEqual(result, expected)
 
 if __name__ == '__main__':
     unittest.main()
