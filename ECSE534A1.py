@@ -1,5 +1,8 @@
-import numpy as np
+﻿import numpy as np
 import random
+import logging
+
+logger = logging.getLogger('numerical-application')
 
 def createTestMatrices(lowerBound, upperBound):
     """Computes a series of test matrices for Choleski algorithm
@@ -29,7 +32,38 @@ def createTestMatrix(size):
     testMatrix = aMatrix.dot(bMatrix) #generate an SPD matrix
     return testMatrix
 
+def choleskiFacotrization(inputMatrix, initialValueVector):
+    inputMatrix = np.array([(3.0,1.0),(1.0,2.0)], dtype=np.float64)
+    initialValueVector = np.array([(1.0,1.0)], dtype=np.float64).T
+
+    #input validation
+    if inputMatrix.dtype == np.integer:
+        logger.warning('inputMatrix is of type integer, there will be a \
+        loss of precision in this algorithm. Please provide float')
+    if initialValueVector.dtype == np.integer:
+        logger.warning('initialValueVector is of type integer, there will be a \
+        loss of precision in this algorithm. Please provide float')
+
+    rowLength = inputMatrix.shape[0]
+    columnLength = inputMatrix.shape[1]
+    for j in range(columnLength):
+        if inputMatrix[j, j] <= 0:
+            raise Exception("invalid value in matrix, it is not SPD")
+        
+        sqrtTerm = np.sqrt(inputMatrix[j,j])
+        inputMatrix[j,j] = sqrtTerm
+        initialValueVector[j] = initialValueVector[j] / inputMatrix[j,j]
+        for i in range(j+1, rowLength):
+            inputMatrix[i,j] = inputMatrix[i,j] / inputMatrix[j,j]
+            initialValueVector[i] = initialValueVector[i] - (inputMatrix[i,j]*initialValueVector[j])
+            for k in range(j+1, i):
+                inputMatrix[i,k] = inputMatrix[i,k] - (inputMatrix[i,j]*inputMatrix[k,j])
+
+    return (inputMatrix, initialValueVector)
 if __name__ == '__main__':
+    
     result = createTestMatrices(2, 12)
     nonSPDMatrix = np.array([(-2,1), (1,2)])
-    print(nonSPDMatrix)
+    result = choleskiFacotrization(None, None)
+    print(result)
+    #print(nonSPDMatrix)
