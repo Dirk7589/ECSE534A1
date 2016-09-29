@@ -8,6 +8,10 @@ class Test_test1(unittest.TestCase):
         self.assertEqual(result.shape[0], matrix_size, msg='Row is incorrect size')
         self.assertEqual(result.shape[1], matrix_size, msg='Column is incorrect size')
 
+        matrix_size = 0
+        with self.assertRaises(IndexError):
+            methods.createTestMatrix(matrix_size)
+
     def test_createTestMatrices(self):
         lowerBound = 2
         upperBound = 10
@@ -15,5 +19,10 @@ class Test_test1(unittest.TestCase):
         expectedLength = (upperBound - lowerBound)+1
         self.assertEqual(len(result), expectedLength, msg='Result is incorrect length')
 
+        with self.assertRaises(IndexError):
+            methods.createTestMatrices(1, 10)
+
+        with self.assertRaises(IndexError):
+            methods.createTestMatrices(2, 2)
 if __name__ == '__main__':
     unittest.main()
