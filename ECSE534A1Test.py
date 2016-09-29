@@ -1,5 +1,6 @@
 import unittest
 import ECSE534A1 as methods
+import numpy as np
 
 class Test_test1(unittest.TestCase):
     def test_createTestMatrix(self):
@@ -24,5 +25,13 @@ class Test_test1(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             methods.createTestMatrices(2, 2)
+
+    def test_choleskiFacotrization(self):
+        inputMatrix = np.array(([0,0], [0,0]))
+        initialVector = np.array([0,0]).T
+
+        with self.assertRaises(Exception):
+            methods.choleskiFacotrization(inputMatrix, initialValueVector)
+
 if __name__ == '__main__':
     unittest.main()
