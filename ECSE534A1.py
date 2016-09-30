@@ -33,8 +33,6 @@ def createTestMatrix(size):
     return testMatrix
 
 def choleskiFacotrization(inputMatrix, initialValueVector):
-    inputMatrix = np.array([(3.0,1.0),(1.0,2.0)], dtype=np.float64)
-    initialValueVector = np.array([(1.0,1.0)], dtype=np.float64).T
 
     #input validation
     if inputMatrix.dtype == np.integer:
@@ -54,6 +52,7 @@ def choleskiFacotrization(inputMatrix, initialValueVector):
         inputMatrix[j,j] = sqrtTerm
         initialValueVector[j] = initialValueVector[j] / inputMatrix[j,j]
         for i in range(j+1, rowLength):
+            value = inputMatrix[i,j]
             inputMatrix[i,j] = inputMatrix[i,j] / inputMatrix[j,j]
             initialValueVector[i] = initialValueVector[i] - (inputMatrix[i,j]*initialValueVector[j])
             for k in range(j+1, i):
