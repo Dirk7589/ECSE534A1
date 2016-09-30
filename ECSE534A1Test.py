@@ -1,4 +1,4 @@
-import unittest
+﻿import unittest
 import ECSE534A1 as methods
 import numpy as np
 
@@ -27,19 +27,19 @@ class Test_test1(unittest.TestCase):
             methods.createTestMatrices(2, 2)
 
     def test_choleskiFacotrization(self):
-        inputMatrix = np.array(([0,0], [0,0]))
-        initialVector = np.array([0,0]).T
+        inputMatrix = np.array(([0,0], [0,0]),dtype=np.float)
+        initialVector = np.array([0,0],dtype=np.float).T
 
         with self.assertRaises(Exception):
-            methods.choleskiFacotrization(inputMatrix, initialValueVector)
+            methods.choleskiFacotrization(inputMatrix, initialVector)
         
-        testMatrix = np.array(([2,1],[1,2]))
+        testMatrix = np.array(([25,15,-5],[15,18,0],[-5,0,11]),dtype=np.float)
         testMatrix = testMatrix.dot(testMatrix.T)
-        inputMatrix = testMatrix
-        initialVector = np.array([1,1]).T
+        inputMatrix = np.copy(testMatrix)
+        initialVector = np.array([1,1,1], dtype=np.float).T
         result = methods.choleskiFacotrization(inputMatrix, initialVector)
-        expected = np.linalg.cholesky(testMatrix)
-        self.assertEqual(result, expected)
+        expected = result[0].dot(result[0].T)
+        self.assertEqual(testMatrix, expected)
 
 if __name__ == '__main__':
     unittest.main()
