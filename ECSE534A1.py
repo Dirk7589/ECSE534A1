@@ -61,10 +61,10 @@ def choleskiFacotrization(inputMatrix, initialValueVector):
 
     return (inputMatrix, initialValueVector)
 
-    def backSubstitution(upperTriangularMatrix, intermediateValues):
-        resultVector = np.array()
+def backSubstitution(upperTriangularMatrix, intermediateValues):
+    resultVector = np.array()
 
-        return resultVector
+    return resultVector
 if __name__ == '__main__':
     
     pass
