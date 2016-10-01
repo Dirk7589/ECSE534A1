@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger('numerical-application')
 
-def createTestMatrices(lowerBound, upperBound):
+def createSPDMatrices(lowerBound, upperBound):
     """Computes a series of test matrices for Choleski algorithm
     :param lowerBound: dimension of smallest test matrix
     :param upperBound: dimension of largest test matrix
@@ -16,10 +16,10 @@ def createTestMatrices(lowerBound, upperBound):
         raise IndexError('upperBound must be larger than lowerBound')
     testMatrices = []
     for i in range(lowerBound, upperBound + 1):
-        testMatrices.append(createTestMatrix(i))
+        testMatrices.append(createSPDMatrix(i))
     return testMatrices
 
-def createTestMatrix(size):
+def createSPDMatrix(size):
     """Creates an nxn matrix that is SPD with no zeros
     Return the test matrix
     """
