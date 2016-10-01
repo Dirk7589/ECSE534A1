@@ -60,10 +60,11 @@ def choleskiFacotrization(inputMatrix, initialValueVector):
                 inputMatrix[i,k] = inputMatrix[i,k] - inputMatrix[i,j]*inputMatrix[k,j]
 
     return (inputMatrix, initialValueVector)
+
+    def backSubstitution(upperTriangularMatrix, intermediateValues):
+        resultVector = np.array()
+
+        return resultVector
 if __name__ == '__main__':
     
-    result = createTestMatrices(2, 12)
-    nonSPDMatrix = np.array([(-2,1), (1,2)])
-    result = choleskiFacotrization(None, None)
-    print(result)
-    #print(nonSPDMatrix)
+    pass
