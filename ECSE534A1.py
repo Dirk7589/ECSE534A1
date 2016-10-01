@@ -33,7 +33,11 @@ def createSPDMatrix(size):
     return testMatrix
 
 def choleskiFacotrization(inputMatrix, initialValueVector):
-
+    """Computes the choelski factorization along with the intermediate values
+    :param inputMatrix: matrix to be converted to lower triangular
+    :param initialValueVector: initital value vector
+    Returns a tuple, (lower triangular result, intermediate values)
+    """
     #input validation
     if inputMatrix.dtype == np.integer:
         logger.warning('inputMatrix is of type integer, there will be a \
@@ -58,7 +62,8 @@ def choleskiFacotrization(inputMatrix, initialValueVector):
             initialValueVector[i] = initialValueVector[i] - (inputMatrix[i,j]*initialValueVector[j])
             for k in np.arange(j+1, i+1):
                 inputMatrix[i,k] = inputMatrix[i,k] - inputMatrix[i,j]*inputMatrix[k,j]
-
+    
+    inputMatrix = np.tril(inputMatrix) #zeroes items above the diagonal
     return (inputMatrix, initialValueVector)
 
 def backSubstitution(upperTriangularMatrix, intermediateValues):
