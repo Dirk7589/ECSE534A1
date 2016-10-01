@@ -45,18 +45,18 @@ def choleskiFacotrization(inputMatrix, initialValueVector):
     rowLength = inputMatrix.shape[0]
     columnLength = inputMatrix.shape[1]
     
-    for j in range(columnLength):
+    for j in np.arange(columnLength):
         if inputMatrix[j, j] <= 0:
             raise Exception("invalid value in matrix, it is not SPD")
         
         sqrtTerm = np.sqrt(inputMatrix[j,j])
         inputMatrix[j,j] = sqrtTerm
         initialValueVector[j] = initialValueVector[j] / inputMatrix[j,j]
-        for i in range(j+1, rowLength):
+        for i in np.arange(j+1, rowLength):
             value = inputMatrix[i,j]
             inputMatrix[i,j] = inputMatrix[i,j] / inputMatrix[j,j]
             initialValueVector[i] = initialValueVector[i] - (inputMatrix[i,j]*initialValueVector[j])
-            for k in range(j+1, i+1):
+            for k in np.arange(j+1, i+1):
                 inputMatrix[i,k] = inputMatrix[i,k] - inputMatrix[i,j]*inputMatrix[k,j]
 
     return (inputMatrix, initialValueVector)
