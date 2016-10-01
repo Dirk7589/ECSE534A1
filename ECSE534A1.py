@@ -32,34 +32,34 @@ def createTestMatrix(size):
     testMatrix = aMatrix.dot(bMatrix) #generate an SPD matrix
     return testMatrix
 
-def choleskiFacotrization(A, b):
+def choleskiFacotrization(inputMatrix, initialValueVector):
 
     #input validation
-    if A.dtype == np.integer:
+    if inputMatrix.dtype == np.integer:
         logger.warning('inputMatrix is of type integer, there will be a \
         loss of precision in this algorithm. Please provide float')
-    if b.dtype == np.integer:
+    if initialValueVector.dtype == np.integer:
         logger.warning('initialValueVector is of type integer, there will be a \
         loss of precision in this algorithm. Please provide float')
 
-    rowLength = A.shape[0]
-    columnLength = A.shape[1]
-    L = np.zeros((rowLength,columnLength), dtype=np.float)
+    rowLength = inputMatrix.shape[0]
+    columnLength = inputMatrix.shape[1]
+    
     for j in range(columnLength):
-        if A[j, j] <= 0:
+        if inputMatrix[j, j] <= 0:
             raise Exception("invalid value in matrix, it is not SPD")
         
-        sqrtTerm = np.sqrt(A[j,j])
-        L[j,j] = sqrtTerm
-        b[j] = b[j] / L[j,j]
+        sqrtTerm = np.sqrt(inputMatrix[j,j])
+        inputMatrix[j,j] = sqrtTerm
+        initialValueVector[j] = initialValueVector[j] / inputMatrix[j,j]
         for i in range(j+1, rowLength):
-            value = A[i,j]
-            L[i,j] = A[i,j] / L[j,j]
-            b[i] = b[i] - (L[i,j]*b[j])
+            value = inputMatrix[i,j]
+            inputMatrix[i,j] = inputMatrix[i,j] / inputMatrix[j,j]
+            initialValueVector[i] = initialValueVector[i] - (inputMatrix[i,j]*initialValueVector[j])
             for k in range(j+1, i+1):
-                A[i,k] = A[i,k] - L[i,j]*L[k,j]
+                inputMatrix[i,k] = inputMatrix[i,k] - inputMatrix[i,j]*inputMatrix[k,j]
 
-    return (L, b)
+    return (inputMatrix, initialValueVector)
 if __name__ == '__main__':
     
     result = createTestMatrices(2, 12)
