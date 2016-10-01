@@ -2,7 +2,17 @@
 import random
 import logging
 
-logger = logging.getLogger('numerical-application')
+def initLogger():
+    logger = logging.getLogger('numerical-application')
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.WARNING)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    # add the handlers to the logger
+    logger.addHandler(ch)
+    return logger
+logger =  initLogger()
 
 def createSPDMatrices(lowerBound, upperBound):
     """Computes a series of test matrices for Choleski algorithm
@@ -32,6 +42,18 @@ def createSPDMatrix(size):
     testMatrix = aMatrix.dot(bMatrix) #generate an SPD matrix
     return testMatrix
 
+def choleskiSolver(inputMatrix, initialValueVector):
+    """"Solves a matrix problem inputMatrix*x=initialValueVector using choleski
+    decomposition.
+    :param inputMatrx: The square SPD input matrix
+    :param initialValueVector: The vector containing the initial conditions
+    Returns the resulting x vector
+    """
+    choleskiResult = choleskiFacotrization(inputMatrix, initialValueVector)
+    result = backSubstitution(choleskiResult[0], choleskiResult[1])
+    return result
+
+
 def choleskiFacotrization(inputMatrix, initialValueVector):
     """Computes the choelski factorization along with the intermediate values
     :param inputMatrix: matrix to be converted to lower triangular
@@ -40,11 +62,11 @@ def choleskiFacotrization(inputMatrix, initialValueVector):
     """
     #input validation
     if inputMatrix.dtype == np.integer:
-        logger.warning('inputMatrix is of type integer, there will be a \
-        loss of precision in this algorithm. Please provide float')
+        logger.warning('inputMatrix is of type integer.\
+        there will be a loss of precision. Please provide float')
     if initialValueVector.dtype == np.integer:
-        logger.warning('initialValueVector is of type integer, there will be a \
-        loss of precision in this algorithm. Please provide float')
+        logger.warning('initialValueVector is of type integer.\
+        there will be a loss of precision. Please provide float')
 
     rowLength = inputMatrix.shape[0]
     columnLength = inputMatrix.shape[1]
@@ -66,10 +88,23 @@ def choleskiFacotrization(inputMatrix, initialValueVector):
     inputMatrix = np.tril(inputMatrix) #zeroes items above the diagonal
     return (inputMatrix, initialValueVector)
 
-def backSubstitution(upperTriangularMatrix, intermediateValues):
-    resultVector = np.array()
+def backSubstitution(upperTriangularMatrix, inputVector):
+    """Performs the back substitution on an upper triangular matrix,
+    for a given inputVector
+    :param upperTriangularMatrix: the upper triangular matrix to solve
+    :param inputVector: the associated input vector to substitute
+    Returns the resulting vector
+    """
+    resultVector = np.zeros_like(inputVector).T
+    n = resultVector.shape[0]
+    for i in np.arange(n):
+        sum = 0
+        for j in np.arange(i+1, n):
+            sum += upperTriangularMatrix[j,i]*resultVector[j]
+        resultVector[i] = (inputVector[i] - sum) / upperTriangularMatrix[i,i]
 
     return resultVector
+
 if __name__ == '__main__':
     
     pass
