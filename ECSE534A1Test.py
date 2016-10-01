@@ -25,21 +25,33 @@ class Test_test1(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             methods.createSPDMatrices(2, 2)
-
+    
+    def test_backSubstitution(self):
+        #setup
+        size = 2
+        solutionVector = np.random.randint(1,9,size=(size))
+        incidenceMatrix = methods.createSPDMatrix(size)
+        initialVector = incidenceMatrix.dot(solutionVector)
+        choleskiResult = methods.choleskiFacotrization(incidenceMatrix, initialVector)
+        #run
+        result = methods.backSubstitution(choleskiResult[0], choleskiResult[1])
+        #assert
+        np.testing.assert_equal(result, solutionVector)
+    
     def test_choleskiFacotrization(self):
         inputMatrix = np.array(([0,0], [0,0]),dtype=np.float)
         initialVector = np.array([0,0],dtype=np.float).T
 
         with self.assertRaises(Exception):
             methods.choleskiFacotrization(inputMatrix, initialVector)
-        testMatrices = methods.createSPDMatrices(2,10)
-        for testMatrix in testMatrices:
-            testMatrix = np.array(([5,4],[4,5]),dtype=np.float)
-            inputMatrix = np.copy(testMatrix)
-            initialVector = np.array([1,1], dtype=np.float).T
-            result = methods.choleskiFacotrization(inputMatrix, initialVector)
-            expected = result[0].dot(result[0].T)
-            self.assertEquals(testMatrix.all(), expected.all())
+
+        testMatrix = np.array(([25,15,-5],[15,18,0],[-5,0,11]),dtype=np.float)
+        inputMatrix = np.copy(testMatrix)
+        initialVector = np.array([1,1,1], dtype=np.float).T
+        result = methods.choleskiFacotrization(inputMatrix, initialVector)
+        expected = result[0].dot(result[0].T)
+        np.testing.assert_equal(testMatrix, expected)
+
 
 if __name__ == '__main__':
     unittest.main()
