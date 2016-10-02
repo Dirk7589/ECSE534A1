@@ -95,15 +95,18 @@ def backSubstitution(upperTriangularMatrix, inputVector):
     :param inputVector: the associated input vector to substitute
     Returns the resulting vector
     """
-    resultVector = np.zeros_like(inputVector).T
+    resultVector = np.zeros_like(inputVector)
     n = resultVector.shape[0]
-    for i in np.arange(n):
+    i = n
+    while(i > 0):
+        i -= 1
         sum = 0
         for j in np.arange(i+1, n):
-            sum += upperTriangularMatrix[j,i]*resultVector[j]
+            newValue = upperTriangularMatrix[i,j]*resultVector[j]
+            sum = sum + newValue
         resultVector[i] = (inputVector[i] - sum) / upperTriangularMatrix[i,i]
 
-    return resultVector
+    return resultVector 
 
 if __name__ == '__main__':
     
