@@ -29,12 +29,12 @@ class Test_test1(unittest.TestCase):
     def test_backSubstitution(self):
         #setup
         size = 2
-        solutionVector = np.random.randint(1,9,size=(size))
-        incidenceMatrix = methods.createSPDMatrix(size)
+        solutionVector = np.array(([1],[1]))
+        incidenceMatrix = np.array(([5,4],[4,5]))
         initialVector = incidenceMatrix.dot(solutionVector)
         choleskiResult = methods.choleskiFacotrization(incidenceMatrix, initialVector)
         #run
-        result = methods.backSubstitution(choleskiResult[0], choleskiResult[1])
+        result = methods.backSubstitution(choleskiResult[0].T, choleskiResult[1])
         #assert
         np.testing.assert_equal(result, solutionVector)
     
