@@ -29,14 +29,14 @@ class Test_test1(unittest.TestCase):
     def test_backSubstitution(self):
         #setup
         size = 2
-        solutionVector = np.array(([1],[1]))
-        incidenceMatrix = np.array(([5,4],[4,5]))
+        solutionVector = np.array(([2],[1]), dtype=np.float)
+        incidenceMatrix = np.array(([5,4],[4,5]), dtype=np.float)
         initialVector = incidenceMatrix.dot(solutionVector)
         choleskiResult = methods.choleskiFacotrization(incidenceMatrix, initialVector)
         #run
         result = methods.backSubstitution(choleskiResult[0].T, choleskiResult[1])
         #assert
-        np.testing.assert_equal(result, solutionVector)
+        np.testing.assert_allclose(result, solutionVector)
     
     def test_choleskiFacotrization(self):
         inputMatrix = np.array(([0,0], [0,0]),dtype=np.float)
