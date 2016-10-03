@@ -25,7 +25,14 @@ class Test_test1(unittest.TestCase):
 
         with self.assertRaises(IndexError):
             methods.createSPDMatrices(2, 2)
-    
+    def test_choleskiSolver(self):
+        testMatrices = methods.createSPDMatrices(2,10)
+        for testMatrix in testMatrices:
+            size = testMatrix.shape[0]
+            solutionVector = np.linspace(1, 1, num=size, dtype=np.float)
+            result = methods.choleskiSolver(testMatrix, solutionVector)
+            np.testing.assert_allclose(result, solutionVector)
+
     def test_backSubstitution(self):
         #setup
         size = 2
