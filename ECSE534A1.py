@@ -49,17 +49,6 @@ def choleskiSolver(inputMatrix, initialValueVector):
     :param initialValueVector: The vector containing the initial conditions
     Returns the resulting x vector
     """
-    choleskiResult = choleskiFacotrization(inputMatrix, initialValueVector)
-    result = backSubstitution(choleskiResult[0], choleskiResult[1])
-    return result
-
-
-def choleskiFacotrization(inputMatrix, initialValueVector):
-    """Computes the choelski factorization along with the intermediate values
-    :param inputMatrix: matrix to be converted to lower triangular
-    :param initialValueVector: initital value vector
-    Returns a tuple, (lower triangular result, intermediate values)
-    """
     #input validation
     if inputMatrix.dtype == np.integer:
         logger.warning('inputMatrix is of type integer.\
@@ -85,8 +74,15 @@ def choleskiFacotrization(inputMatrix, initialValueVector):
             for k in np.arange(j+1, i+1):
                 inputMatrix[i,k] = inputMatrix[i,k] - inputMatrix[i,j]*inputMatrix[k,j]
     
-    inputMatrix = np.tril(inputMatrix) #zeroes items above the diagonal
-    return (inputMatrix, initialValueVector)
+    resultVector = np.zeros_like(initialValueVector)
+    n = resultVector.shape[0]
+    for i in np.arange(n):
+        sum = 0
+        for j in np.arange(j+1, n):
+            sum += (inputMatrix[j,i]*resultVector[j])
+        resultVector[i] = (initialValueVector[i] - sum) / inputMatrix[i,i]
+
+    return resultVector
 
 def backSubstitution(upperTriangularMatrix, inputVector):
     """Performs the back substitution on an upper triangular matrix,
@@ -95,9 +91,7 @@ def backSubstitution(upperTriangularMatrix, inputVector):
     :param inputVector: the associated input vector to substitute
     Returns the resulting vector
     """
-    resultVector = np.zeros_like(inputVector)
-    n = resultVector.shape[0]
-    i = n
+    
     while(i > 0):
         i -= 1
         sum = 0
