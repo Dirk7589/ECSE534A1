@@ -76,12 +76,13 @@ def choleskiSolver(inputMatrix, initialValueVector):
     
     resultVector = np.zeros_like(initialValueVector)
     n = resultVector.shape[0]
-    for i in np.arange(n):
+    i = n - 1
+    while(i >= 0):
         sum = 0
-        for j in np.arange(j+1, n):
+        for j in np.arange(i+1, n):
             sum += (inputMatrix[j,i]*resultVector[j])
         resultVector[i] = (initialValueVector[i] - sum) / inputMatrix[i,i]
-
+        i -= 1
     return resultVector
 
 def backSubstitution(upperTriangularMatrix, inputVector):

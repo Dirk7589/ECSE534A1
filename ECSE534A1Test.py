@@ -33,7 +33,7 @@ class Test_test1(unittest.TestCase):
         with self.assertRaises(Exception):
             methods.choleskiSolver(inputMatrix, initialVector)
 
-        solutionVector = np.array(([1],[1]), dtype=np.float)
+        solutionVector = np.array(([8],[5]), dtype=np.float)
         incidenceMatrix = np.array(([5,4],[4,5]), dtype=np.float)
         testMatrix = np.copy(incidenceMatrix)
         initialVector = incidenceMatrix.dot(solutionVector)
