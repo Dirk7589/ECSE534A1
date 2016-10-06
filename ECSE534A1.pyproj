@@ -29,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="NodeNetworkOne.csv" />
+    <Content Include="TestCircuit1.csv" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
