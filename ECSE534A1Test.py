@@ -48,5 +48,18 @@ class Test_test1(unittest.TestCase):
             result = methods.choleskiSolver(testMatrix, initialVector)
             np.testing.assert_allclose(result, solutionVector)
 
+    def test_readLinearResistiveNetwork(self):
+        A = np.array([[1,-1,0,0,0],[-1,0,1,-1,0],[0,1,-1,0,1],[0,0,0,1,-1]], dtype=np.float)
+        J = np.array([0,0,0,0,0],dtype=np.float)
+        E = np.array([0,0,0,0,1],dtype=np.float)
+        R = np.array([100,100,100,100,10],dtype=np.float)
+        fileName = "NodeNetworkOne.csv"
+        result = methods.readLinearResistiveNetwork(fileName)
+
+        np.testing.assert_allclose(result[0], A)
+        np.testing.assert_allclose(result[1], J)
+        np.testing.assert_allclose(result[2], E)
+        np.testing.assert_allclose(result[3], R)
+
 if __name__ == '__main__':
     unittest.main()

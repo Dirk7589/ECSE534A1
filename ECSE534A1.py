@@ -1,6 +1,7 @@
 ﻿import numpy as np
 import random
 import logging
+import csv
 
 def initLogger():
     logger = logging.getLogger('numerical-application')
@@ -85,6 +86,57 @@ def choleskiSolver(inputMatrix, initialValueVector):
         i -= 1
     return resultVector
 
-if __name__ == '__main__':
+def readLinearResistiveNetwork(fileName):
     
+    A = []
+    J = []
+    E = []
+    R = []
+    aMode = False
+    jMode = False
+    eMode = False
+    rMode = False
+    with open(fileName) as csvFile:
+        reader = csv.reader(csvFile, delimiter=",")
+        for row in reader:
+            if "A" in row:
+                aMode = True
+                jMode = False
+                eMode = False
+                rMode = False
+                continue
+            elif "J" in row:
+                aMode = False
+                jMode = True
+                eMode = False
+                rMode = False
+                continue
+            elif "E" in row:
+                aMode = False
+                jMode = False
+                eMode = True
+                rMode = False
+                continue
+            elif "R" in row:
+                aMode = False
+                jMode = False
+                eMode = False
+                rMode = True
+                continue
+            if aMode:
+                A.append(row)
+            elif jMode:
+                J = row
+            elif eMode:
+                E = row
+            elif rMode:
+                R = row
+    
+    return [np.array(A,dtype=np.float),
+            np.array(J,dtype=np.float).T,
+            np.array(E,dtype=np.float).T,
+            np.array(R,dtype=np.float).T]
+
+if __name__ == '__main__':
+    result = readLinearResistiveNetwork("NodeNetworkOne.csv")
     pass
