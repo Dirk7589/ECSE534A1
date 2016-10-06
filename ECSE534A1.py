@@ -137,6 +137,18 @@ def readLinearResistiveNetwork(fileName):
             np.array(E,dtype=np.float).T,
             np.array(R,dtype=np.float).T]
 
+def solveLinearResistiveNetwork(fileName):
+    elements = readLinearResistiveNetwork(fileName)
+    A = elements[0]
+    J = elements [1]
+    E = elements[2]
+    Y = np.diag(elements[3])
+
+    inputMatrix = A.dot(Y).dot(A.T)
+    initialVector = A.dot((J-Y.dot(E)))
+    result = choleskiSolver(inputMatrix, initialVector)
+    return result
+
 if __name__ == '__main__':
-    result = readLinearResistiveNetwork("NodeNetworkOne.csv")
+    result = solveLinearResistiveNetwork("NodeNetworkOne.csv")
     pass
