@@ -85,24 +85,6 @@ def choleskiSolver(inputMatrix, initialValueVector):
         i -= 1
     return resultVector
 
-def backSubstitution(upperTriangularMatrix, inputVector):
-    """Performs the back substitution on an upper triangular matrix,
-    for a given inputVector
-    :param upperTriangularMatrix: the upper triangular matrix to solve
-    :param inputVector: the associated input vector to substitute
-    Returns the resulting vector
-    """
-    
-    while(i > 0):
-        i -= 1
-        sum = 0
-        for j in np.arange(i+1, n):
-            newValue = upperTriangularMatrix[i,j]*resultVector[j]
-            sum = sum + newValue
-        resultVector[i] = (inputVector[i] - sum) / upperTriangularMatrix[i,i]
-
-    return resultVector 
-
 if __name__ == '__main__':
     
     pass
