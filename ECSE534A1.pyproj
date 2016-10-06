@@ -31,6 +31,8 @@
     <Content Include="NodeNetworkOne.csv" />
     <Content Include="TestCircuit1.csv" />
     <Content Include="TestCircuit2.csv" />
+    <Content Include="TestCircuit3.csv" />
+    <Content Include="TestCircuit4.csv" />
     <Content Include="TestCircuit5.csv" />
   </ItemGroup>
   <PropertyGroup>

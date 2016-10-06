@@ -62,10 +62,12 @@ class Test_test1(unittest.TestCase):
         np.testing.assert_allclose(result[3], R)
 
     def test_solveLinearResistiveNetwork(self):
-        circuits = {'TestCircuit1.csv' : np.array([5]), 'TestCircuit2.csv':np.array([50])}
+        circuits = {'TestCircuit1.csv' : np.array([5]), 'TestCircuit2.csv':np.array([50]),
+                    'TestCircuit3.csv':np.array([55]),'TestCircuit4.csv':np.array([20,35]),
+                    'TestCircuit5.csv':np.array([5,3.75,3.75])}
         for fileName, expected in circuits.items():
             result = methods.solveLinearResistiveNetwork(fileName)
-            np.testing.assert_allclose(result, expected)
+            np.testing.assert_allclose(result, expected, err_msg='Incorrect result for circuit {}'.format(fileName))
 
 
 if __name__ == '__main__':
