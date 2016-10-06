@@ -142,7 +142,7 @@ def solveLinearResistiveNetwork(fileName):
     A = elements[0]
     J = elements [1]
     E = elements[2]
-    Y = np.diag(elements[3])
+    Y = np.diag(1/elements[3])
 
     inputMatrix = A.dot(Y).dot(A.T)
     initialVector = A.dot((J-Y.dot(E)))

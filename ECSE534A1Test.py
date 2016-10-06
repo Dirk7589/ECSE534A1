@@ -62,7 +62,7 @@ class Test_test1(unittest.TestCase):
         np.testing.assert_allclose(result[3], R)
 
     def test_solveLinearResistiveNetwork(self):
-        circuits = {'TestCircuit1.csv' : np.array([5])}
+        circuits = {'TestCircuit1.csv' : np.array([5]), 'TestCircuit2.csv':np.array([50])}
         for fileName, expected in circuits.items():
             result = methods.solveLinearResistiveNetwork(fileName)
             np.testing.assert_allclose(result, expected)
