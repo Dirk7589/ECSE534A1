@@ -41,6 +41,12 @@ class Test_test1(unittest.TestCase):
         np.testing.assert_allclose(np.tril(incidenceMatrix).dot(np.tril(incidenceMatrix).T), testMatrix)
         np.testing.assert_allclose(result, solutionVector)
 
+        testMatrices = methods.createSPDMatrices(2, 10)
+        for testMatrix in testMatrices:
+            solutionVector = np.linspace(1,1,testMatrix.shape[0], dtype=np.float)
+            initialVector = testMatrix.dot(solutionVector)
+            result = methods.choleskiSolver(testMatrix, initialVector)
+            np.testing.assert_allclose(result, solutionVector)
 
 if __name__ == '__main__':
     unittest.main()

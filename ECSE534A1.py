@@ -40,7 +40,7 @@ def createSPDMatrix(size):
     aMatrix = np.random.randint(1,9,size=(size, size)) #generate random matrix
     bMatrix = np.transpose(aMatrix) #compute the transpose
     testMatrix = aMatrix.dot(bMatrix) #generate an SPD matrix
-    return testMatrix
+    return testMatrix.astype(np.float)
 
 def choleskiSolver(inputMatrix, initialValueVector):
     """"Solves a matrix problem inputMatrix*x=initialValueVector using choleski
