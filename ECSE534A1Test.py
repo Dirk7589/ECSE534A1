@@ -49,7 +49,7 @@ class Test_test1(unittest.TestCase):
             np.testing.assert_allclose(result, solutionVector)
 
     def test_readLinearResistiveNetwork(self):
-        A = np.array([[1,-1,0,0,0],[-1,0,1,-1,0],[0,1,-1,0,1],[0,0,0,1,-1]], dtype=np.float)
+        A = np.array([[1,-1,0,0,0],[-1,0,1,-1,0],[0,1,-1,0,1]], dtype=np.float)
         J = np.array([0,0,0,0,0],dtype=np.float)
         E = np.array([0,0,0,0,1],dtype=np.float)
         R = np.array([100,100,100,100,10],dtype=np.float)
