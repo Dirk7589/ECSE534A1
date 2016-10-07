@@ -149,6 +149,39 @@ def solveLinearResistiveNetwork(fileName):
     result = choleskiSolver(inputMatrix, initialVector)
     return result
 
+def createResistorMesh(size):
+    totalNumberOfNodes = size*size
+    totalNumberOfBranches = size*(size-1)+(size-1)*size
+    incidentMatrix = np.zeros((totalNumberOfNodes,totalNumberOfBranches), dtype=np.float)
+
+    branchNumber = 0
+    for i in np.arange(size):
+        for j in np.arange(size):
+
+            nodeNumber = size*(i) + j
+            if i != size-1 and j != size-1:
+                incidentMatrix[nodeNumber, branchNumber] = 1
+                incidentMatrix[nodeNumber+1, branchNumber] = -1
+                incidentMatrix[nodeNumber, branchNumber+1] = 1
+                incidentMatrix[nodeNumber+2, branchNumber+1] = -1
+
+                branchNumber = branchNumber + 1
+            elif i != size-1 and j == size-1:
+                incidentMatrix[nodeNumber, branchNumber] = 1
+                incidentMatrix[nodeNumber+1, branchNumber] = -1
+                branchNumber = branchNumber + 1
+            
+            elif i == size-1 and j != size-1:
+                incidentMatrix[nodeNumber, branchNumber] = 1
+                incidentMatrix[nodeNumber, branchNumber] = -1
+
+                branchNumber = branchNumber + 1
+            else:
+                incidentMatrix[1, branchNumber] = 1
+                incidentMatrix[nodeNumber, branchNumber] = -1
+    return incidentMatrix
+
 if __name__ == '__main__':
     result = solveLinearResistiveNetwork("NodeNetworkOne.csv")
+    createResistorMesh(2)
     pass
