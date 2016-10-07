@@ -32,27 +32,29 @@ class Test_test1(unittest.TestCase):
         initialVector = np.array([0,0],dtype=np.float).T
 
         with self.assertRaises(Exception):
-            #Run
-            methods.choleskiSolver(inputMatrix, initialVector) #Check that an exception is raised
+            #Run and check an exception was raised
+            methods.choleskiSolver(inputMatrix, initialVector) 
 
         #Setup: Check for decompositiong an solution using known result
         solutionVector = np.array(([8],[5]), dtype=np.float) #Arbitrary solution vector
         incidenceMatrix = np.array(([5,4],[4,5]), dtype=np.float) #Known input matrix
-        testMatrix = np.copy(incidenceMatrix) #Store original matrix to compare with decomposition
+        testMatrix = np.copy(incidenceMatrix) #Store original matrix
         initialVector = incidenceMatrix.dot(solutionVector) #Generate initial vector
 
         #Run
         result = methods.choleskiSolver(incidenceMatrix, initialVector)
         #Assert
         lowerTriangularMatrix = np.tril(incidenceMatrix)
-        resultingMatrix = lowerTriangularMatrix.dot(lowerTriangularMatrix.T) #Reconstruct the original matrix
-        np.testing.assert_allclose(resultingMatrix, testMatrix) #Assert the decomposition worked
-        np.testing.assert_allclose(result, solutionVector) #Assert the solution vector is correct
+        #Reconstruct the original matrix
+        resultingMatrix = lowerTriangularMatrix.dot(lowerTriangularMatrix.T)
+        #Assert the decomposition and solution are correct
+        np.testing.assert_allclose(resultingMatrix, testMatrix) 
+        np.testing.assert_allclose(result, solutionVector) 
 
         #Setup: Check with a series of random matrices
         testMatrices = methods.createSPDMatrices(2, 10)
         for testMatrix in testMatrices:
-            solutionVector = np.linspace(1,1,testMatrix.shape[0], dtype=np.float) #Create solution vector
+            solutionVector = np.linspace(1,1,testMatrix.shape[0], dtype=np.float)
             initialVector = testMatrix.dot(solutionVector) #Generate initial vector
             #Run
             result = methods.choleskiSolver(testMatrix, initialVector)
@@ -73,12 +75,18 @@ class Test_test1(unittest.TestCase):
         np.testing.assert_allclose(result[3], R)
 
     def test_solveLinearResistiveNetwork(self):
-        circuits = {'TestCircuit1.csv' : np.array([5]), 'TestCircuit2.csv':np.array([50]),
-                    'TestCircuit3.csv':np.array([55]),'TestCircuit4.csv':np.array([20,35]),
+        #setup
+        circuits = {'TestCircuit1.csv' : np.array([5]), 
+                    'TestCircuit2.csv':np.array([50]),
+                    'TestCircuit3.csv':np.array([55]),
+                    'TestCircuit4.csv':np.array([20,35]),
                     'TestCircuit5.csv':np.array([5,3.75,3.75])}
         for fileName, expected in circuits.items():
+            error_message = 'Incorrect result for circuit {}'.format(fileName)
+            #run
             result = methods.solveLinearResistiveNetwork(fileName)
-            np.testing.assert_allclose(result, expected, err_msg='Incorrect result for circuit {}'.format(fileName))
+            #assert
+            np.testing.assert_allclose(result, expected, err_msg=error_message)
 
 
 if __name__ == '__main__':

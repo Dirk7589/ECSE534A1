@@ -71,7 +71,8 @@ def choleskiSolver(inputMatrix, initialValueVector):
         for i in np.arange(j+1, rowLength):
             value = inputMatrix[i,j]
             inputMatrix[i,j] = inputMatrix[i,j] / inputMatrix[j,j]
-            initialValueVector[i] = initialValueVector[i] - (inputMatrix[i,j]*initialValueVector[j])
+            initialValueVector[i] = initialValueVector[i] - \
+                (inputMatrix[i,j]*initialValueVector[j])
             for k in np.arange(j+1, i+1):
                 inputMatrix[i,k] = inputMatrix[i,k] - inputMatrix[i,j]*inputMatrix[k,j]
     
