@@ -88,6 +88,13 @@ class Test_test1(unittest.TestCase):
             #assert
             np.testing.assert_allclose(result, expected, err_msg=error_message)
 
+    def test_meshWriter(self):
+        #setup
+        size = 2
+        expected = np.array([[-1,-1,0,0],[1,0,-1,0],[0,1,0,-1],[0,0,1,1]], dtype=np.float)
+        #run
+        result = methods.meshWriter(size)
+        np.testing.assert_allclose(result, expected)
 
 if __name__ == '__main__':
     unittest.main()

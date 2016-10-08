@@ -150,6 +150,22 @@ def solveLinearResistiveNetwork(fileName):
     result = choleskiSolver(inputMatrix, initialVector)
     return result
 
+def meshWriter(size):
+        numberOfNodes = size * size
+        numberofBranches = size*(size-1) + (size-1)*size
+        incidenceMatrix = np.zeros((numberOfNodes,numberOfNodes))
+
+        for i in np.arange(size):
+            if i%size != 0:
+                incidenceMatrix[i,i-1] = 1
+            if i%size != size -1:
+                incidenceMatrix[i, i+1] = -1
+            if (i // size) != 0: #integer division
+                incidenceMatrix[i,i-size] = 1
+            if (i // size) != (size*size - size):
+                incidenceMatrix[i, i+size] = -1
+
+        return incidenceMatrix
 if __name__ == '__main__':
     result = solveLinearResistiveNetwork("NodeNetworkOne.csv")
     pass
