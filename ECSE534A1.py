@@ -155,7 +155,7 @@ def meshWriter(size):
         numberofBranches = size*(size-1) + (size-1)*size
         incidenceMatrix = np.zeros((numberOfNodes,numberOfNodes))
 
-        for i in np.arange(size):
+        for i in np.arange(numberOfNodes):
             if i%size != 0:
                 incidenceMatrix[i,i-1] = 1
             if i%size != size -1:
