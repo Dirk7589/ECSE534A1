@@ -151,38 +151,58 @@ def solveLinearResistiveNetwork(fileName):
     return result
 
 def meshWriter(n, m):
-        numberOfNodes = n * m
-        numberofBranches = n*(m-1) + (n-1)*m
-        incidenceMatrix = np.zeros((numberOfNodes,numberofBranches))
+    '''Generates a n by m mesh
+    :param n: the height of the mesh
+    :param m: the width of the mesh
+    Returns the resulting incidence matrix for the mesh
+    The following number scheme for nodes and elements is used:
+    Nodes number 0, 1, 2, ... along the horizontal and elements number 
+    0, 1, 2, ... where an element to the right of node is numbered first
+    and an element beneth the node is numbered second.
+    E.g. 2x2 generates, note a, b, c, d represent the elements:
+    0, a, 1
+    b, , c
+    2, d, 3
+    Also current is considered to be flowing to the right and down through every element.
+    Note, sources must respect this current convention
+    '''
+    numberOfNodes = n * m
+    numberofBranches = n*(m-1) + (n-1)*m
+    incidenceMatrix = np.zeros((numberOfNodes,numberofBranches))
 
-        currentBranchElement = 0
-        for i in np.arange(n):
-            for j in np.arange(m):
-                currentNodeIndex = m*i + j
+    currentBranchElement = 0 #Note the current branch element
+    for i in np.arange(n): #Loop through the rows
+        for j in np.arange(m): #Loop through the columns
+            currentNodeIndex = m*i + j #Compute the current node number given our scheme
 
-                if i != (n-1) and j != (m-1):
-                    incidenceMatrix[currentNodeIndex, currentBranchElement] = 1
-                    incidenceMatrix[currentNodeIndex + 1, currentBranchElement] = -1
-                    incidenceMatrix[currentNodeIndex, currentBranchElement + 1] = 1
-                    incidenceMatrix[currentNodeIndex + m, currentBranchElement + 1] = -1
+            #Compute the current flow for any node not in the last column or row
+            if i != (n-1) and j != (m-1):
+                incidenceMatrix[currentNodeIndex, currentBranchElement] = 1 
+                incidenceMatrix[currentNodeIndex + 1, currentBranchElement] = -1
+                incidenceMatrix[currentNodeIndex, currentBranchElement + 1] = 1
+                incidenceMatrix[currentNodeIndex + m, currentBranchElement + 1] = -1
 
-                    currentBranchElement = currentBranchElement + 2
-                elif i != (n-1) and j == (m-1):
-                    incidenceMatrix[currentNodeIndex, currentBranchElement] = 1
-                    incidenceMatrix[currentNodeIndex + m, currentBranchElement] = -1
+                currentBranchElement = currentBranchElement + 2 #Handled two branches
 
-                    currentBranchElement = currentBranchElement + 1
-                elif i == (n-1) and j != (m-1):
-                    incidenceMatrix[currentNodeIndex, currentBranchElement] = 1
-                    incidenceMatrix[currentNodeIndex + 1, currentBranchElement] =  -1
+            #Handle the last column
+            elif i != (n-1) and j == (m-1):
+                incidenceMatrix[currentNodeIndex, currentBranchElement] = 1
+                incidenceMatrix[currentNodeIndex + m, currentBranchElement] = -1
 
-                    currentBranchElement = currentBranchElement + 1
-                else:
-                    #incidenceMatrix[0, currentBranchElement - 1] = 1 
-                    #incidenceMatrix[currentNodeIndex, currentBranchElement - 1] = -1
-                    pass
+                currentBranchElement = currentBranchElement + 1 #Handled one branch
 
-        return incidenceMatrix
+            #Handle the last row
+            elif i == (n-1) and j != (m-1):
+                incidenceMatrix[currentNodeIndex, currentBranchElement] = 1
+                incidenceMatrix[currentNodeIndex + 1, currentBranchElement] =  -1
+
+                currentBranchElement = currentBranchElement + 1 #Handled one branch
+            else:
+                #incidenceMatrix[0, currentBranchElement - 1] = 1 
+                #incidenceMatrix[currentNodeIndex, currentBranchElement - 1] = -1
+                pass
+
+    return incidenceMatrix
+
 if __name__ == '__main__':
-    result = solveLinearResistiveNetwork("NodeNetworkOne.csv")
     pass
