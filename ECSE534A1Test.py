@@ -90,10 +90,9 @@ class Test_test1(unittest.TestCase):
 
     def test_meshWriter(self):
         #setup
-        size = 2
-        expected = np.array([[-1,-1,0,0],[1,0,-1,0],[0,1,0,-1],[0,0,1,1]], dtype=np.float)
+        expected = np.array([[1,1,0,0],[-1,0,1,0],[0,-1,0,1],[0,0,-1,-1]], dtype=np.float)
         #run
-        result = methods.meshWriter(size)
+        result = methods.meshWriter(2, 2)
         np.testing.assert_allclose(result, expected)
 
 if __name__ == '__main__':
