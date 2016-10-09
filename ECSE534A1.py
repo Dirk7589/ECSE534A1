@@ -178,8 +178,9 @@ def meshWriter(n, m):
 
                     currentBranchElement = currentBranchElement + 1
                 else:
-                    incidenceMatrix[0, currentBranchElement - 1] = 1 
-                    incidenceMatrix[currentNodeIndex, currentBranchElement - 1] = -1
+                    #incidenceMatrix[0, currentBranchElement - 1] = 1 
+                    #incidenceMatrix[currentNodeIndex, currentBranchElement - 1] = -1
+                    pass
 
         return incidenceMatrix
 if __name__ == '__main__':
