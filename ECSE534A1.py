@@ -107,9 +107,10 @@ def choleskiSolverSparse(inputMatrix, initialValueVector, halfBandwidth):
         inputMatrix[j,j] = sqrtTerm
         initialValueVector[j] = initialValueVector[j] / inputMatrix[j,j]
 
-        bandwidthLimit = i + halfBandwidth + 1
+        bandwidthLimit = j + halfBandwidth + 1
         if bandwidthLimit > columnLength:
             bandwidthLimit = columnLength #Ensure we don't index past the bottom
+
         for i in np.arange(j+1, bandwidthLimit): #Iterate over those items in the band
             value = inputMatrix[i,j]
             inputMatrix[i,j] = inputMatrix[i,j] / inputMatrix[j,j]
