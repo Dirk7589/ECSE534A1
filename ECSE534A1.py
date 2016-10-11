@@ -87,7 +87,7 @@ def choleskiSolver(inputMatrix, initialValueVector):
         i -= 1
     return resultVector
 
-def choleskiSolverSparse(inputMatrix, initialValueVector, bandwidth):
+def choleskiSolverSparse(inputMatrix, initialValueVector, halfBandwidth):
     #input validation
     if inputMatrix.dtype == np.integer:
         logger.warning('inputMatrix is of type integer.\
@@ -106,7 +106,11 @@ def choleskiSolverSparse(inputMatrix, initialValueVector, bandwidth):
         sqrtTerm = np.sqrt(inputMatrix[j,j])
         inputMatrix[j,j] = sqrtTerm
         initialValueVector[j] = initialValueVector[j] / inputMatrix[j,j]
-        for i in np.arange(j+1, rowLength):
+
+        bandwidthLimit = i + halfBandwidth + 1
+        if bandwidthLimit > columnLength:
+            bandwidthLimit = columnLength #Ensure we don't index past the bottom
+        for i in np.arange(j+1, bandwidthLimit): #Iterate over those items in the band
             value = inputMatrix[i,j]
             inputMatrix[i,j] = inputMatrix[i,j] / inputMatrix[j,j]
             initialValueVector[i] = initialValueVector[i] - \
@@ -124,8 +128,6 @@ def choleskiSolverSparse(inputMatrix, initialValueVector, bandwidth):
         resultVector[i] = (initialValueVector[i] - sum) / inputMatrix[i,i]
         i -= 1
     return resultVector
-
-    return
 
 def readLinearResistiveNetwork(fileName):
     
