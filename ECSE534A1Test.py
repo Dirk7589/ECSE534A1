@@ -128,10 +128,11 @@ class Test_test1(unittest.TestCase):
 
     def test_meshWriter(self):
         #setup
-        expected = np.array([[1,1,0,0],[-1,0,1,0],[0,-1,0,1],[0,0,-1,-1]], dtype=np.float)
+        expectedIncidence = np.array([[1,1,0,0],[-1,0,1,0],[0,-1,0,1],[0,0,-1,-1]], 
+                                     dtype=np.float)
         #run
         result = methods.meshWriter(2, 2)
-        np.testing.assert_allclose(result, expected)
+        np.testing.assert_allclose(result[0], expectedIncidence)
 
 if __name__ == '__main__':
     unittest.main()

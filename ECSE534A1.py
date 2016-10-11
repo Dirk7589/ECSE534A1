@@ -209,6 +209,7 @@ def meshWriter(n, m):
     Also current is considered to be flowing to the right and down through every element.
     Note, sources must respect this current convention
     '''
+    result = []
     numberOfNodes = n * m
     numberofBranches = n*(m-1) + (n-1)*m
     incidenceMatrix = np.zeros((numberOfNodes,numberofBranches))
@@ -244,8 +245,15 @@ def meshWriter(n, m):
                 #incidenceMatrix[0, currentBranchElement - 1] = 1 
                 #incidenceMatrix[currentNodeIndex, currentBranchElement - 1] = -1
                 pass
-
-    return incidenceMatrix
+    
+    E = np.zeros(numberOfNodes)
+    J = np.zeros(numberofBranches)
+    R = np.zeros(numberofBranches)
+    result.append(incidenceMatrix)
+    result.append(E)
+    result.append(J)
+    result.append(R)
+    return result
 
 if __name__ == '__main__':
     pass
