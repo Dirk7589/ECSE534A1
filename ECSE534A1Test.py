@@ -63,6 +63,44 @@ class Test_test1(unittest.TestCase):
             #Assert
             np.testing.assert_allclose(result, solutionVector)
 
+    def test_CholeskiSolverSpare(self):
+        #Setup: Check for positive definite error check
+        inputMatrix = np.array(([0,0], [0,0]),dtype=np.float)
+        initialVector = np.array([0,0],dtype=np.float).T
+        bandwidth = 0
+
+        with self.assertRaises(Exception):
+            #Run and check an exception was raised
+            methods.choleskiSolverSparse(inputMatrix, initialVector, bandwidth) 
+
+        #Setup: Check for decompositiong an solution using known result
+        solutionVector = np.array(([8],[5]), dtype=np.float) #Arbitrary solution vector
+        incidenceMatrix = np.array(([5,4],[4,5]), dtype=np.float) #Known input matrix
+        testMatrix = np.copy(incidenceMatrix) #Store original matrix
+        initialVector = incidenceMatrix.dot(solutionVector) #Generate initial vector
+
+        #Run
+        result = methods.choleskiSolverSparse(incidenceMatrix, initialVector, bandwidth)
+        #Assert
+        lowerTriangularMatrix = np.tril(incidenceMatrix)
+        #Reconstruct the original matrix
+        resultingMatrix = lowerTriangularMatrix.dot(lowerTriangularMatrix.T)
+        #Assert the decomposition and solution are correct
+        np.testing.assert_allclose(resultingMatrix, testMatrix, 
+                                   err_msg='Incorrect decomposition matrix') 
+        np.testing.assert_allclose(result, solutionVector, 
+                                   err_msg='Incorrect solution vector') 
+
+        #Setup: Check with a series of random matrices
+        testMatrices = methods.createSPDMatrices(2, 10)
+        for testMatrix in testMatrices:
+            solutionVector = np.linspace(1,1,testMatrix.shape[0], dtype=np.float)
+            initialVector = testMatrix.dot(solutionVector) #Generate initial vector
+            #Run
+            result = methods.choleskiSolverSparse(testMatrix, initialVector, bandwidth)
+            #Assert
+            np.testing.assert_allclose(result, solutionVector)
+
     def test_readLinearResistiveNetwork(self):
         A = np.array([[1,-1,0,0,0],[-1,0,1,-1,0],[0,1,-1,0,1]], dtype=np.float)
         J = np.array([0,0,0,0,0],dtype=np.float)
