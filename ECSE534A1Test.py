@@ -48,8 +48,10 @@ class Test_test1(unittest.TestCase):
         #Reconstruct the original matrix
         resultingMatrix = lowerTriangularMatrix.dot(lowerTriangularMatrix.T)
         #Assert the decomposition and solution are correct
-        np.testing.assert_allclose(resultingMatrix, testMatrix) 
-        np.testing.assert_allclose(result, solutionVector) 
+        np.testing.assert_allclose(resultingMatrix, testMatrix, 
+                                   err_msg='Incorrect decomposition matrix') 
+        np.testing.assert_allclose(result, solutionVector, 
+                                   err_msg='Incorrect solution vector') 
 
         #Setup: Check with a series of random matrices
         testMatrices = methods.createSPDMatrices(2, 10)
