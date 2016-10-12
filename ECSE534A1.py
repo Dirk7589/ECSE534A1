@@ -213,6 +213,10 @@ def meshWriter(n, m):
     numberOfNodes = n * m
     numberofBranches = n*(m-1) + (n-1)*m
     incidenceMatrix = np.zeros((numberOfNodes,numberofBranches))
+    E = np.zeros(numberofBranches)
+    J = np.zeros(numberofBranches)
+    R = np.ones(numberofBranches)
+    R = R*1000
 
     currentBranchElement = 0 #Note the current branch element
     for i in np.arange(n): #Loop through the rows
@@ -230,25 +234,31 @@ def meshWriter(n, m):
 
             #Handle the last column
             elif i != (n-1) and j == (m-1):
-                incidenceMatrix[currentNodeIndex, currentBranchElement] = 1
-                incidenceMatrix[currentNodeIndex + m, currentBranchElement] = -1
+                if i == 0:
+                    incidenceMatrix[currentNodeIndex, currentBranchElement] = 1
+                    incidenceMatrix[currentNodeIndex + m, currentBranchElement] = -1
+                else:
+                    incidenceMatrix[currentNodeIndex, currentBranchElement] = 1
+                    incidenceMatrix[currentNodeIndex + m, currentBranchElement] = -1
 
                 currentBranchElement = currentBranchElement + 1 #Handled one branch
-
             #Handle the last row
             elif i == (n-1) and j != (m-1):
                 incidenceMatrix[currentNodeIndex, currentBranchElement] = 1
                 incidenceMatrix[currentNodeIndex + 1, currentBranchElement] =  -1
 
                 currentBranchElement = currentBranchElement + 1 #Handled one branch
+            
             else:
                 #incidenceMatrix[0, currentBranchElement - 1] = 1 
                 #incidenceMatrix[currentNodeIndex, currentBranchElement - 1] = -1
                 pass
-    
-    E = np.zeros(numberOfNodes)
-    J = np.zeros(numberofBranches)
-    R = np.zeros(numberofBranches)
+    lowerLeftNodeIndex = m*(n-1)
+    lowerLeftNode = incidenceMatrix[lowerLeftNodeIndex]
+    for j in lowerLeftNode:
+        if lowerLeftNode[j] != 0:
+            incidenceMatrix[m-1,j] = lowerLeftNode[j]
+    np.delete(incidenceMatrix, lowerLeftNodeIndex)
     result.append(incidenceMatrix)
     result.append(E)
     result.append(J)
