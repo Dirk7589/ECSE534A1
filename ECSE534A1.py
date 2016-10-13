@@ -391,12 +391,13 @@ def finiteDifferencePotentialSolver():
                                     nextGuess[i-1, j]+ 
                                     2*nextGuess[i, j+1]-
                                     4*nextGuess[i,j])^2)
-                residualNorm += np.sqrt((nextGuess[i+1,j] + 
-                                    nextGuess[i-1, j]+ 
-                                    nextGuess[i, j+1]+ 
-                                    nextGuess[i, j-1]-
-                                    4*nextGuess[i,j])^2)
-                #Consider Neuman boundaries
+                else:
+                    residualNorm += np.sqrt((nextGuess[i+1,j] + 
+                                        nextGuess[i-1, j]+ 
+                                        nextGuess[i, j+1]+ 
+                                        nextGuess[i, j-1]-
+                                        4*nextGuess[i,j])^2)
+                
         
         
 
