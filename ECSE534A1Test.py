@@ -63,7 +63,7 @@ class Test_test1(unittest.TestCase):
             #Assert
             np.testing.assert_allclose(result, solutionVector)
 
-    def test_CholeskiSolverSpare(self):
+    def test_CholeskiSolverSparse(self):
         #Setup: Check for positive definite error check
         inputMatrix = np.array(([0,0], [0,0]),dtype=np.float)
         initialVector = np.array([0,0],dtype=np.float).T
