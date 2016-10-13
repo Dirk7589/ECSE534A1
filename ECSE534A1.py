@@ -307,5 +307,14 @@ def runLinearResistiveMeshTests():
         sizeVReq[1] = result['req']
     plt.plot(sizeVReq[0], sizeVReq[1])
 
+def sorSolver(inputMatrix, relaxation, tolerance):
+    if relaxation > 2:
+        raise Exception('You have an illegal relaxation value {},\
+        it must be less than 2'.format(relaxation))
+    residual = 1
+    iterationNumber = 0
+    updatedInputMatrix = inputMatrix #Set the initial guess to our current input
+
+    return 
 if __name__ == '__main__':
     pass
