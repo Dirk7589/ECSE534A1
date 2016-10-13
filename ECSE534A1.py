@@ -266,7 +266,7 @@ def meshWriter(n, m):
     result.append(R)
     return result
 
-def solveMeshResistances():
+def solveMeshResistances(sparse=False):
     meshSizes = np.linspace(2,15,1)
     results = []
     for meshSize in meshSizes:
@@ -282,7 +282,11 @@ def solveMeshResistances():
         startTime = time.time() #start timing
         inputMatrix = A.dot(Y).dot(A.T)
         initialVector = A.dot((J-Y.dot(E)))
-        solutionVector = choleskiSolver(inputMatrix, initialVector)
+        if sparse:
+            b = A.shape[0]
+            solutionVector = choleskiSolverSparse(inputMatrix, initialVector, b)
+        else:
+            solutionVector = choleskiSolver(inputMatrix, initialVector)
         #Compute Req
 
         deltaTime = time.time() - startTime #end timing
