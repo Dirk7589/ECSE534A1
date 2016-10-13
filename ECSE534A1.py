@@ -307,7 +307,7 @@ def runLinearResistiveMeshTests():
         sizeVReq[1] = result['req']
     plt.plot(sizeVReq[0], sizeVReq[1])
 
-def finiteDifferencePotentialSolver():
+def finiteDifferencePotentialSolver(h, relaxation):
     '''Solves for a set of potentials using finite difference approach.
     By exploiting symmetry, the following region is considered
     ----b--------
@@ -341,7 +341,6 @@ def finiteDifferencePotentialSolver():
             if j == corner[1] and i < corner[0]:
                 potentialMatrix[i,j] = 0 #Side a
 
-    relaxation = 1.5
     residualNorm = 1
     iterationNumber = 0
     tolerance = 10^-5
@@ -399,9 +398,9 @@ def finiteDifferencePotentialSolver():
                                         4*nextGuess[i,j])^2)
                 
         
-        
-
-    return nextGuess
+        iterationNumber += 1
+    result = {'h':h,'relaxation':relaxation,'iteratations': iterationNumber, 'potentials': nextGuess}
+    return result
 if __name__ == '__main__':
     finiteDifferencePotentialSolver()
     pass
