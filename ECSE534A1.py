@@ -3,6 +3,7 @@ import random
 import logging
 import csv
 import time
+import matplotlib.pyplot as plt
 
 def initLogger():
     logger = logging.getLogger('numerical-application')
@@ -296,6 +297,15 @@ def solveMeshResistances(sparse=False):
         result['req'] = equivalentResistance
         results.append(result)
     return result
+
+def runLinearResistiveMeshTests():
+    nonSparseResults = solveMeshResistances(False)
+    sparseResults = solveMeshResistances(True)
+    sizeVReq = [[],[]]
+    for result in nonSparseResults:
+        sizeVReq[0] = result['size']
+        sizeVReq[1] = result['req']
+    plt.plot(sizeVReq[0], sizeVReq[1])
 
 if __name__ == '__main__':
     pass
