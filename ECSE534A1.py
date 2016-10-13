@@ -2,6 +2,7 @@
 import random
 import logging
 import csv
+import time
 
 def initLogger():
     logger = logging.getLogger('numerical-application')
@@ -263,6 +264,33 @@ def meshWriter(n, m):
     result.append(E)
     result.append(J)
     result.append(R)
+    return result
+
+def solveMeshResistances():
+    meshSizes = np.linspace(2,15,1)
+    results = []
+    for meshSize in meshSizes:
+        deltaTime = 0
+        equivalentResistance = 0
+        result = {'size':0, 'time':0, 'req':[]}
+        elements = meshWriter(meshSize, meshSize)
+        A = elements[0]
+        E = elements [1]
+        J = elements[2]
+        Y = np.diag(1/elements[3])
+        
+        startTime = time.time() #start timing
+        inputMatrix = A.dot(Y).dot(A.T)
+        initialVector = A.dot((J-Y.dot(E)))
+        solutionVector = choleskiSolver(inputMatrix, initialVector)
+        #Compute Req
+
+        deltaTime = time.time() - startTime #end timing
+        #Assign results
+        result['size'] = meshSize
+        result['time'] = deltaTime
+        result['req'] = equivalentResistance
+        results.append(result)
     return result
 
 if __name__ == '__main__':
