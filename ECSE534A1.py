@@ -307,14 +307,100 @@ def runLinearResistiveMeshTests():
         sizeVReq[1] = result['req']
     plt.plot(sizeVReq[0], sizeVReq[1])
 
-def sorSolver(inputMatrix, relaxation, tolerance):
-    if relaxation > 2:
-        raise Exception('You have an illegal relaxation value {},\
-        it must be less than 2'.format(relaxation))
-    residual = 1
-    iterationNumber = 0
-    updatedInputMatrix = inputMatrix #Set the initial guess to our current input
+def finiteDifferencePotentialSolver():
+    '''Solves for a set of potentials using finite difference approach.
+    By exploiting symmetry, the following region is considered
+    ----b--------
+    |           |
+    c           d
+    |---a---|   |
+            f   |
+            |   |
+            --e--
+    where c and e are Neuman boundaries and the rest are dirchlet. Note, i, j = (0,0)
+    starts in the lower left corner.
+    '''
+    height = 0.02+0.08
+    width = 0.06+0.04
+    h = 0.001
 
-    return 
+    n = width/h
+    m = height/h
+    corner = (0.04/h, 0.02/h)
+
+    potentialMatrix = np.zeros((n,m))
+    #Populate the matrix with the boundary conditions
+    for i in np.arange(n):
+        for j in np.arange(m):
+            if i == corner[0] and j < corner[1]:
+                potentialMatrix[i,j] = 110 #Side f
+            if i == n-1:
+                potentialMatrix[i,j] = 0 #Side d
+            if j == m-1:
+                potentialMatrix[i,j] = 0 #Side b
+            if j == corner[1] and i < corner[0]:
+                potentialMatrix[i,j] = 0 #Side a
+
+    relaxation = 1.5
+    residualNorm = 1
+    iterationNumber = 0
+    tolerance = 10^-5
+    
+    while(residualNorm > tolerance):
+        nextGuess = np.copy(potentialMatrix)
+        for i in np.arange(n):
+            for j in np.arange(m):
+                if i < corner[0] and j < corner[1]:
+                    break #Do nothing as it is outside the problem domain
+                if i == 0:
+                    if j > corner[1]:
+                        #Handle Neuman boundary on c
+                        nextGuess[i,j] = ( (1-relaxation)*nextGuess[i,j] + 
+                                          (relaxation/4)*(2*nextGuess[i+1,j]+
+                                                nextGuess[i,j+1] +
+                                                nextGuess[i, j-1]) )
+                elif j == 0: 
+                    if i > corner[0]:
+                        #Handle Neuman boundary on e
+                        nextGuess[i,j] = ( (1-relaxation)*nextGuess[i,j] +
+                                          (relaxation/4)*(nextGuess[i+1,j]+ 
+                                                nextGuess[i-1,j] +
+                                                2*nextGuess[i,j+1]) )
+                else:
+                    #Handle regular free nodes in the problem domain
+                    nextGuess[i,j] = ( (1-relaxation)*nextGuess[i,j] +
+                                            (relaxation/4)*(nextGuess[i+1,j]+ 
+                                            nextGuess[i-1,j] +
+                                            nextGuess[i,j+1] + 
+                                            nextGuess[i, j-1]) )
+        #compute residual
+        residualNorm = 0
+        for i in np.arange(n):
+            for j in np.arange(m):
+                if i < corner[0] and j < corner[1]:
+                    break
+                if i == 0:
+                    if j >corner[1]:
+                        residualNorm += np.sqrt((2*nextGuess[i+1,j] + 
+                                    nextGuess[i, j+1]+ 
+                                    nextGuess[i, j-1]-
+                                    4*nextGuess[i,j])^2)
+                if j == 0:
+                    if i >corner[0]:
+                        residualNorm += np.sqrt((nextGuess[i+1,j] + 
+                                    nextGuess[i-1, j]+ 
+                                    2*nextGuess[i, j+1]-
+                                    4*nextGuess[i,j])^2)
+                residualNorm += np.sqrt((nextGuess[i+1,j] + 
+                                    nextGuess[i-1, j]+ 
+                                    nextGuess[i, j+1]+ 
+                                    nextGuess[i, j-1]-
+                                    4*nextGuess[i,j])^2)
+                #Consider Neuman boundaries
+        
+        
+
+    return nextGuess
 if __name__ == '__main__':
+    finiteDifferencePotentialSolver()
     pass
