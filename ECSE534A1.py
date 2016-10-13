@@ -320,38 +320,44 @@ def finiteDifferencePotentialSolver(h, relaxation):
     where c and e are Neuman boundaries and the rest are dirchlet. Note, i, j = (0,0)
     starts in the lower left corner.
     '''
+    xCoord = 0.1-0.06 # Has equivalent potential to x = 0.06
+    yCoord = 0.1-0.04 # Has the equivalent potentail to y = 0.04
+    iCoord = xCoord // h
+    jCoord = yCoord // h
+    maxTries = 1000
     height = 0.02+0.08
     width = 0.06+0.04
-    h = 0.001
-
+    innerConductorVoltage = 10
+    outerConductorVoltage = 0
     n = width/h
     m = height/h
     corner = (0.04/h, 0.02/h)
 
-    potentialMatrix = np.zeros((n,m))
+    potentialMatrix = np.zeros((n,m),dtype=np.float)
     #Populate the matrix with the boundary conditions
     for i in np.arange(n):
         for j in np.arange(m):
-            if i == corner[0] and j < corner[1]:
-                potentialMatrix[i,j] = 110 #Side f
+            if i == corner[0] and j <= corner[1]:
+                potentialMatrix[i,j] = innerConductorVoltage #Side f includes corner
             if i == n-1:
-                potentialMatrix[i,j] = 0 #Side d
+                potentialMatrix[i,j] = outerConductorVoltage #Side d
             if j == m-1:
-                potentialMatrix[i,j] = 0 #Side b
+                potentialMatrix[i,j] = outerConductorVoltage #Side b
             if j == corner[1] and i < corner[0]:
-                potentialMatrix[i,j] = 0 #Side a
+                potentialMatrix[i,j] = innerConductorVoltage #Side a excludes corner
 
     residualNorm = 1
     iterationNumber = 0
-    tolerance = 10^-5
+    tolerance = 10**(-5)
     
-    while(residualNorm > tolerance):
+    while(residualNorm > tolerance and iterationNumber != maxTries):
         nextGuess = np.copy(potentialMatrix)
-        for i in np.arange(n):
-            for j in np.arange(m):
-                if i < corner[0] and j < corner[1]:
+
+        for i in np.arange(n-1): #Do not include outer boundary
+            for j in np.arange(m-1): #Do not include outer boundary
+                if i <= corner[0] and j <= corner[1]:
                     break #Do nothing as it is outside the problem domain
-                if i == 0:
+                elif i == 0:
                     if j > corner[1]:
                         #Handle Neuman boundary on c
                         nextGuess[i,j] = ( (1-relaxation)*nextGuess[i,j] + 
@@ -372,35 +378,41 @@ def finiteDifferencePotentialSolver(h, relaxation):
                                             nextGuess[i-1,j] +
                                             nextGuess[i,j+1] + 
                                             nextGuess[i, j-1]) )
+
+        #Check if boundaries have been respected
         #compute residual
         residualNorm = 0
-        for i in np.arange(n):
-            for j in np.arange(m):
-                if i < corner[0] and j < corner[1]:
+        for i in np.arange(n-1): #Do not include outer boundary
+            for j in np.arange(m-1):
+                if i <= corner[0] and j <= corner[1]:
                     break
-                if i == 0:
+                elif i == 0:
                     if j >corner[1]:
                         residualNorm += np.sqrt((2*nextGuess[i+1,j] + 
                                     nextGuess[i, j+1]+ 
                                     nextGuess[i, j-1]-
-                                    4*nextGuess[i,j])^2)
-                if j == 0:
+                                    4*nextGuess[i,j])**2)
+                elif j == 0:
                     if i >corner[0]:
                         residualNorm += np.sqrt((nextGuess[i+1,j] + 
                                     nextGuess[i-1, j]+ 
                                     2*nextGuess[i, j+1]-
-                                    4*nextGuess[i,j])^2)
+                                    4*nextGuess[i,j])**2)
                 else:
                     residualNorm += np.sqrt((nextGuess[i+1,j] + 
                                         nextGuess[i-1, j]+ 
                                         nextGuess[i, j+1]+ 
                                         nextGuess[i, j-1]-
-                                        4*nextGuess[i,j])^2)
+                                        4*nextGuess[i,j])**2)
                 
         
         iterationNumber += 1
-    result = {'h':h,'relaxation':relaxation,'iteratations': iterationNumber, 'potentials': nextGuess}
+    if iterationNumber == maxTries:
+        raise Exception(
+            'You have exceeded the maximum number of iterations {}'.format(maxTries))
+    result = {'h':h,'relaxation':relaxation,'iteratations': iterationNumber, 
+              'potentials': nextGuess, 'x,y':nextGuess[iCoord, jCoord]}
     return result
 if __name__ == '__main__':
-    finiteDifferencePotentialSolver()
+    result = finiteDifferencePotentialSolver(0.01000, 1.5)
     pass
