@@ -329,9 +329,9 @@ def finiteDifferencePotentialSolver(h, relaxation):
     width = 0.06+0.04
     innerConductorVoltage = 10
     outerConductorVoltage = 0
-    n = width/h
-    m = height/h
-    corner = (0.04/h, 0.02/h)
+    n = int(width//h)
+    m = int(height//h)
+    corner = (int(0.04//h), int(0.02//h))
 
     potentialMatrix = np.zeros((n,m),dtype=np.float)
     #Populate the matrix with the boundary conditions
@@ -349,14 +349,13 @@ def finiteDifferencePotentialSolver(h, relaxation):
     residualNorm = 1
     iterationNumber = 0
     tolerance = 10**(-5)
-    
-    while(residualNorm > tolerance and iterationNumber != maxTries):
-        nextGuess = np.copy(potentialMatrix)
-
+    nextGuess = np.copy(potentialMatrix)
+    allTolerable = False
+    while(not allTolerable):
         for i in np.arange(n-1): #Do not include outer boundary
             for j in np.arange(m-1): #Do not include outer boundary
                 if i <= corner[0] and j <= corner[1]:
-                    break #Do nothing as it is outside the problem domain
+                    pass #Do nothing as it is outside the problem domain
                 elif i == 0:
                     if j > corner[1]:
                         #Handle Neuman boundary on c
@@ -380,39 +379,58 @@ def finiteDifferencePotentialSolver(h, relaxation):
                                             nextGuess[i, j-1]) )
 
         #Check if boundaries have been respected
+        for i in np.arange(n):
+            for j in np.arange(m):
+                if i == corner[0] and j <= corner[1]:
+                    if potentialMatrix[i,j] != innerConductorVoltage: #Side f includes corner
+                        raise Exception('modified boundary')
+                if i == n-1:
+                    if potentialMatrix[i,j] != outerConductorVoltage: #Side f includes corner
+                        raise Exception('modified boundary')
+                if j == m-1:
+                    if potentialMatrix[i,j] != outerConductorVoltage: #Side f includes corner
+                        raise Exception('modified boundary')
+                if j == corner[1] and i < corner[0]:
+                    if potentialMatrix[i,j] != innerConductorVoltage: #Side f includes corner
+                        raise Exception('modified boundary')
+                     
         #compute residual
-        residualNorm = 0
+        allTolerable = True
         for i in np.arange(n-1): #Do not include outer boundary
             for j in np.arange(m-1):
+                residual = 1
                 if i <= corner[0] and j <= corner[1]:
-                    break
+                    residual = tolerance
+                    pass
                 elif i == 0:
                     if j >corner[1]:
-                        residualNorm += np.sqrt((2*nextGuess[i+1,j] + 
+                        residual = (2*nextGuess[i+1,j] + 
                                     nextGuess[i, j+1]+ 
                                     nextGuess[i, j-1]-
-                                    4*nextGuess[i,j])**2)
+                                    4*nextGuess[i,j])
                 elif j == 0:
                     if i >corner[0]:
-                        residualNorm += np.sqrt((nextGuess[i+1,j] + 
+                        residual = (nextGuess[i+1,j] + 
                                     nextGuess[i-1, j]+ 
                                     2*nextGuess[i, j+1]-
-                                    4*nextGuess[i,j])**2)
+                                    4*nextGuess[i,j])
                 else:
-                    residualNorm += np.sqrt((nextGuess[i+1,j] + 
+                    residual = (nextGuess[i+1,j] + 
                                         nextGuess[i-1, j]+ 
                                         nextGuess[i, j+1]+ 
                                         nextGuess[i, j-1]-
-                                        4*nextGuess[i,j])**2)
-                
-        
+                                        4*nextGuess[i,j])
+                if abs(residual) > tolerance:
+                    allTolerable = False
         iterationNumber += 1
-    if iterationNumber == maxTries:
-        raise Exception(
-            'You have exceeded the maximum number of iterations {}'.format(maxTries))
+        if iterationNumber == maxTries:
+            raise Exception(
+                'You have exceeded the maximum number of iterations {}'.format(maxTries))
     result = {'h':h,'relaxation':relaxation,'iteratations': iterationNumber, 
               'potentials': nextGuess, 'x,y':nextGuess[iCoord, jCoord]}
     return result
 if __name__ == '__main__':
-    result = finiteDifferencePotentialSolver(0.01000, 1.5)
+    result = finiteDifferencePotentialSolver(0.01, 1.5)
+    result2 = finiteDifferencePotentialSolver(0.01, 0.4)
+    np.testing.assert_allclose(result['potentials'], result2['potentials'])
     pass
