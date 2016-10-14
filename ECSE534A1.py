@@ -455,12 +455,44 @@ def relaxationTesting():
 
 def meshSizeTesting():
     relaxation = 1.19 #Chosen based on the relaxation testing
+    meshSizes = [0.02]
+    x_y = []
+    iterations = []
+    meshInverse = []
+    for i in range(4):
+        nextMeshSize = meshSizes[len(meshSizes)-1] / 1.5
+        meshSizes.append(nextMeshSize)
+    for meshSize in meshSizes:
+        meshInverse.append(1/meshSize)
+        result = finiteDifferencePotentialSolver(meshSize, relaxation)
+        x_y.append(result['x,y'])
+        iterations.append(result['iterations'])
+        print('Phi(0.04, 0.06): {} | 1/h {}'.format(result['x,y'],
+                                                    1/meshSize))
+        print('Iterations: {} | 1/h {}'.format(result['iterations'],
+                                                    1/meshSize))
+    #Graph of potential and inverse mesh
+    plt.figure(1)
+    plt.title('Potential Phi(0.04,0.06) versus 1/meshSize (h)')
+    plt.xlabel('1/meshSize (h)')
+    plt.ylabel('Potential Phi(0.04,0.06) (V)')
+    plt.plot(meshInverse, x_y)
+    
+    #Graph of iterations and inverse mesh    
+    plt.figure(2)
+    plt.title('Number of iterations versus 1/meshSize (h)')
+    plt.xlabel('1/meshSize (h)')
+    plt.ylabel('Number of itereations')
+    plt.plot(meshInverse, iterations)
+    plt.show()
+    return
 
 if __name__ == '__main__':
-    relaxationTesting()
-    result = finiteDifferencePotentialSolver(0.01, 1.5)
-    result2 = finiteDifferencePotentialSolver(0.01, 0.4)
-    np.testing.assert_allclose(result['x,y'],[3.567])
-    np.testing.assert_allclose(result['potentials'], result2['potentials'])
+    meshSizeTesting()
+    #relaxationTesting()
+    #result = finiteDifferencePotentialSolver(0.01, 1.5)
+    #result2 = finiteDifferencePotentialSolver(0.01, 0.4)
+    #np.testing.assert_allclose(result['x,y'],[3.567])
+    #np.testing.assert_allclose(result['potentials'], result2['potentials'])
     
     pass
