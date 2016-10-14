@@ -441,110 +441,10 @@ def finiteDifferencePotentialSolver(h, relaxation):
         if iterationNumber == maxTries:
             raise Exception(
                 'You have exceeded the maximum number of iterations {}'.format(maxTries))
+    
     result = {'h':h,'relaxation':relaxation,'iterations': iterationNumber, 
               'potentials': nextGuess, 'x,y':nextGuess[iCoord, jCoord]}
     return result
-
-def relaxationTesting():
-    h = 0.02
-    relaxations = np.linspace(1.1,2.0,num=10, endpoint=False) #Generate w
-    iterations = []
-    for relaxation in relaxations:
-        result = finiteDifferencePotentialSolver(h, relaxation) #Compute finite diff
-        #Tabluate the results
-        print("Relaxation: {} | Iterations: {} | Phi(0.06,0.04): {}".format(
-            truncateFloat(result['relaxation'],3),
-            result['iterations'],
-            truncateFloat(result['x,y'], 3)))
-
-        iterations.append(result['iterations'])
-    #Plot the resulting iterations and w
-    plt.xlabel('Relaxation factor (w)')
-    plt.ylabel('Number of iterations')
-    plt.title('Number of iterations vs relaxation factor (w)')
-    plt.grid(True)
-    plt.plot(relaxations, iterations)
-    plt.show()
-
-def meshSizeTesting():
-    relaxation = 1.19 #Chosen based on the relaxation testing
-    meshSizes = [0.02] #The starting mesh size
-    outerConductor = 0
-    innerConductor = 110
-    x_y_SOR = []
-    iterations_SOR = []
-    x_y_Jacobi = []
-    iterations_Jacobi = []
-    meshInverse = []
-    #Prepare the meshsizes
-    for i in range(3): #Pick an upper limit that is reasonable given computation time
-        nextMeshSize = meshSizes[len(meshSizes)-1] / 2
-        meshSizes.append(nextMeshSize)
-    
-        
-    for meshSize in meshSizes:
-        meshInverse.append(1/meshSize)
-
-        #Compute results for SOR
-        result = finiteDifferencePotentialSolver(meshSize, relaxation)
-        x_y_SOR.append(result['x,y'])
-        iterations_SOR.append(result['iterations'])
-        print('SOR Phi(0.04, 0.06): {} | 1/h {}'.format(truncateFloat(result['x,y'], 3),
-                                                    1/meshSize))
-        print('SOR Iterations: {} | 1/h {}'.format(result['iterations'],
-                                                    1/meshSize))
-        #Compute results for Jacobi
-        result = finiteDifferenceJacobi(meshSize)
-        x_y_Jacobi.append(result['x,y'])
-        iterations_Jacobi.append(result['iterations'])
-        print('Jacobi Phi(0.04, 0.06): {} | 1/h: {}'.format(
-            truncateFloat(result['x,y'], 3), 1/meshSize))
-        print('Jacobi Iterations: {} | 1/h: {}'.format(result['iterations'],
-                                                    1/meshSize))
-    #Graph of potential and inverse mesh
-    plt.title('Potential Phi(0.04,0.06) versus 1/meshSize (h) using SOR')
-    plt.xlabel('1/meshSize (h)')
-    plt.ylabel('Potential Phi(0.04,0.06) (V)')
-    plt.grid(True)
-    plt.ylim([outerConductor, innerConductor]) #Display y over a meaningful range
-    plt.plot(meshInverse, x_y_SOR, '-o')
-    plt.savefig('sor_mesh_potential.pdf', format='pdf')
-   
-    #Graph of iterations and inverse mesh
-    plt.clf()
-    plt.cla()    
-    plt.title('Number of iterations versus 1/meshSize (h) using SOR')
-    plt.xlabel('1/meshSize (h)')
-    plt.ylabel('Number of itereations')
-    plt.grid(True)
-    plt.ylim([0,iterations_SOR[len(iterations_SOR)-1]])
-    plt.plot(meshInverse, iterations_SOR, '-o')
-    plt.savefig('sor_mesh_iterations.pdf', format='pdf')
-    
-    
-    #Graph of potential and inverse mesh
-    plt.clf()
-    plt.cla()
-    plt.title('Potential Phi(0.04,0.06) versus 1/meshSize (h) using Jacobi')
-    plt.xlabel('1/meshSize (h)')
-    plt.ylabel('Potential Phi(0.04,0.06) (V)')
-    plt.grid(True)
-    plt.ylim([outerConductor, innerConductor]) #Display y over a meaningful range
-    plt.plot(meshInverse, x_y_Jacobi, '-o')
-    plt.savefig('jacobi_mesh_potential.pdf', format='pdf')
-    
-    #Graph of iterations and inverse mesh
-    plt.clf()
-    plt.cla()    
-    plt.title('Number of iterations versus 1/meshSize (h) using Jacobi')
-    plt.xlabel('1/meshSize (h)')
-    plt.ylabel('Number of itereations')
-    plt.grid(True)
-    plt.ylim([0,iterations_Jacobi[len(iterations_Jacobi)-1]])
-    plt.plot(meshInverse, iterations_Jacobi, '-o')
-    plt.savefig('jacobi_mesh_iterations.pdf', format='pdf')
-    
-    return
 
 def finiteDifferenceJacobi(h):
     '''Solves for a set of potentials using finite difference approach.
@@ -646,17 +546,119 @@ def finiteDifferenceJacobi(h):
         if iterationNumber == maxTries:
             raise Exception(
                 'You have exceeded the maximum number of iterations {}'.format(maxTries))
+    
     result = {'h':h,'iterations': iterationNumber, 
               'potentials': potentialMatrix, 'x,y':potentialMatrix[iCoord, jCoord]}
     return result
 
+def relaxationTesting():
+    '''Tests the relaxation of the finiteDifferencePotentialSolver
+    Generates graphs and tabular output
+    '''
+    h = 0.02
+    relaxations = np.linspace(1.1,2.0,num=10, endpoint=False) #Generate w
+    iterations = []
+    for relaxation in relaxations:
+        result = finiteDifferencePotentialSolver(h, relaxation) #Compute finite diff
+        #Tabluate the results
+        print("Relaxation: {} | Iterations: {} | Phi(0.06,0.04): {}".format(
+            truncateFloat(result['relaxation'],3),
+            result['iterations'],
+            truncateFloat(result['x,y'], 3)))
+
+        iterations.append(result['iterations'])
+    #Plot the resulting iterations and w
+    plt.xlabel('Relaxation factor (w)')
+    plt.ylabel('Number of iterations')
+    plt.title('Number of iterations vs relaxation factor (w)')
+    plt.grid(True)
+    plt.plot(relaxations, iterations)
+    plt.savefig('q3b.pdf', format='pdf')
+
+def meshSizeTesting():
+    '''Tests the finiteDifferencePotentialSolver and the finiteJacobi solver.
+    Uses a fixed relaxation determined using relaxationTesting().
+    Generates graphs and tabular output
+    '''
+    relaxation = 1.19 #Chosen based on the relaxation testing
+    meshSizes = [0.02] #The starting mesh size
+    outerConductor = 0
+    innerConductor = 110
+    x_y_SOR = []
+    iterations_SOR = []
+    x_y_Jacobi = []
+    iterations_Jacobi = []
+    meshInverse = []
+    #Prepare the meshsizes
+    for i in range(3): #Pick an upper limit that is reasonable given computation time
+        nextMeshSize = meshSizes[len(meshSizes)-1] / 2
+        meshSizes.append(nextMeshSize)
+    
+        
+    for meshSize in meshSizes:
+        meshInverse.append(1/meshSize)
+
+        #Compute results for SOR
+        result = finiteDifferencePotentialSolver(meshSize, relaxation)
+        x_y_SOR.append(result['x,y'])
+        iterations_SOR.append(result['iterations'])
+        print('SOR Phi(0.04, 0.06): {} | 1/h {}'.format(truncateFloat(result['x,y'], 3),
+                                                    1/meshSize))
+        print('SOR Iterations: {} | 1/h {}'.format(result['iterations'],
+                                                    1/meshSize))
+        #Compute results for Jacobi
+        result = finiteDifferenceJacobi(meshSize)
+        x_y_Jacobi.append(result['x,y'])
+        iterations_Jacobi.append(result['iterations'])
+        print('Jacobi Phi(0.04, 0.06): {} | 1/h: {}'.format(
+            truncateFloat(result['x,y'], 3), 1/meshSize))
+        print('Jacobi Iterations: {} | 1/h: {}'.format(result['iterations'],
+                                                    1/meshSize))
+    #Graph of potential and inverse mesh
+    plt.title('Potential Phi(0.04,0.06) versus 1/meshSize (h) using SOR')
+    plt.xlabel('1/meshSize (h)')
+    plt.ylabel('Potential Phi(0.04,0.06) (V)')
+    plt.grid(True)
+    plt.ylim([outerConductor, innerConductor]) #Display y over a meaningful range
+    plt.plot(meshInverse, x_y_SOR, '-o')
+    plt.savefig('sor_mesh_potential.pdf', format='pdf')
+   
+    #Graph of iterations and inverse mesh
+    plt.clf()
+    plt.cla()    
+    plt.title('Number of iterations versus 1/meshSize (h) using SOR')
+    plt.xlabel('1/meshSize (h)')
+    plt.ylabel('Number of itereations')
+    plt.grid(True)
+    plt.ylim([0,iterations_SOR[len(iterations_SOR)-1]])
+    plt.plot(meshInverse, iterations_SOR, '-o')
+    plt.savefig('sor_mesh_iterations.pdf', format='pdf')
+    
+    
+    #Graph of potential and inverse mesh
+    plt.clf()
+    plt.cla()
+    plt.title('Potential Phi(0.04,0.06) versus 1/meshSize (h) using Jacobi')
+    plt.xlabel('1/meshSize (h)')
+    plt.ylabel('Potential Phi(0.04,0.06) (V)')
+    plt.grid(True)
+    plt.ylim([outerConductor, innerConductor]) #Display y over a meaningful range
+    plt.plot(meshInverse, x_y_Jacobi, '-o')
+    plt.savefig('jacobi_mesh_potential.pdf', format='pdf')
+    
+    #Graph of iterations and inverse mesh
+    plt.clf()
+    plt.cla()    
+    plt.title('Number of iterations versus 1/meshSize (h) using Jacobi')
+    plt.xlabel('1/meshSize (h)')
+    plt.ylabel('Number of itereations')
+    plt.grid(True)
+    plt.ylim([0,iterations_Jacobi[len(iterations_Jacobi)-1]])
+    plt.plot(meshInverse, iterations_Jacobi, '-o')
+    plt.savefig('jacobi_mesh_iterations.pdf', format='pdf')
+    
+    return
+
 if __name__ == '__main__':
-    meshSizeTesting()
-    #result = finiteDifferenceJacobi(0.01)
-    #relaxationTesting()
-    #result = finiteDifferencePotentialSolver(0.01, 1.19)
-    #result2 = finiteDifferencePotentialSolv~   er(0.01, 0.4)
-    #np.testing.assert_allclose(result['x,y'],[3.567])
-    #np.testing.assert_allclose(result['potentials'], result2['potentials'])
     
     pass
