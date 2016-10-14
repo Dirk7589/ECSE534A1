@@ -466,29 +466,35 @@ def relaxationTesting():
 
 def meshSizeTesting():
     relaxation = 1.19 #Chosen based on the relaxation testing
-    meshSizes = [0.02]
+    meshSizes = [0.02] #The starting mesh size
     x_y_SOR = []
     iterations_SOR = []
     x_y_Jacobi = []
     iterations_Jacobi = []
     meshInverse = []
-    for i in range(3):
+    #Prepare the meshsizes
+    for i in range(3): #Pick an upper limit that is reasonable given computation time
         nextMeshSize = meshSizes[len(meshSizes)-1] / 2
         meshSizes.append(nextMeshSize)
+    
+        
     for meshSize in meshSizes:
         meshInverse.append(1/meshSize)
+
+        #Compute results for SOR
         result = finiteDifferencePotentialSolver(meshSize, relaxation)
         x_y_SOR.append(result['x,y'])
         iterations_SOR.append(result['iterations'])
-        print('SOR Phi(0.04, 0.06): {} | 1/h {}'.format(result['x,y'],
+        print('SOR Phi(0.04, 0.06): {} | 1/h {}'.format(truncateFloat(result['x,y'], 3),
                                                     1/meshSize))
         print('SOR Iterations: {} | 1/h {}'.format(result['iterations'],
                                                     1/meshSize))
+        #Compute results for Jacobi
         result = finiteDifferenceJacobi(meshSize)
         x_y_Jacobi.append(result['x,y'])
         iterations_Jacobi.append(result['iterations'])
-        print('Jacobi Phi(0.04, 0.06): {} | 1/h: {}'.format(result['x,y'],
-                                                    1/meshSize))
+        print('Jacobi Phi(0.04, 0.06): {} | 1/h: {}'.format(
+            truncateFloat(result['x,y'], 3), 1/meshSize))
         print('Jacobi Iterations: {} | 1/h: {}'.format(result['iterations'],
                                                     1/meshSize))
     #Graph of potential and inverse mesh
