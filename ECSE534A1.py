@@ -307,6 +307,22 @@ def runLinearResistiveMeshTests():
         sizeVReq[1] = result['req']
     plt.plot(sizeVReq[0], sizeVReq[1])
 
+def boundaryCheck(corner, innerConductorVoltage, m, n, outerConductorVoltage, potentialMatrix):
+    for i in np.arange(n):
+        for j in np.arange(m):
+            if i == corner[0] and j <= corner[1]:
+                if potentialMatrix[i,j] != innerConductorVoltage: #Side f includes corner
+                    raise Exception('modified boundary')
+            if i == n-1:
+                if potentialMatrix[i,j] != outerConductorVoltage: #Side f includes corner
+                    raise Exception('modified boundary')
+            if j == m-1:
+                if potentialMatrix[i,j] != outerConductorVoltage: #Side f includes corner
+                    raise Exception('modified boundary')
+            if j == corner[1] and i < corner[0]:
+                if potentialMatrix[i,j] != innerConductorVoltage: #Side f includes corner
+                    raise Exception('modified boundary')
+
 def finiteDifferencePotentialSolver(h, relaxation):
     '''Solves for a set of potentials using finite difference approach.
     By exploiting symmetry, the following region is considered
@@ -337,7 +353,7 @@ def finiteDifferencePotentialSolver(h, relaxation):
     #Populate the matrix with the boundary conditions
     for i in np.arange(n):
         for j in np.arange(m):
-            if i == corner[0] and j <= corner[1]:
+            if i <= corner[0] and j <= corner[1]:
                 potentialMatrix[i,j] = innerConductorVoltage #Side f includes corner
             if i == n-1:
                 potentialMatrix[i,j] = outerConductorVoltage #Side d
@@ -381,20 +397,7 @@ def finiteDifferencePotentialSolver(h, relaxation):
         previousGuess = nextGuess
 
         #Check if boundaries have been respected
-        for i in np.arange(n):
-            for j in np.arange(m):
-                if i == corner[0] and j <= corner[1]:
-                    if potentialMatrix[i,j] != innerConductorVoltage: #Side f includes corner
-                        raise Exception('modified boundary')
-                if i == n-1:
-                    if potentialMatrix[i,j] != outerConductorVoltage: #Side f includes corner
-                        raise Exception('modified boundary')
-                if j == m-1:
-                    if potentialMatrix[i,j] != outerConductorVoltage: #Side f includes corner
-                        raise Exception('modified boundary')
-                if j == corner[1] and i < corner[0]:
-                    if potentialMatrix[i,j] != innerConductorVoltage: #Side f includes corner
-                        raise Exception('modified boundary')
+        boundaryCheck(corner, innerConductorVoltage, m, n, outerConductorVoltage, potentialMatrix)
                      
         #compute residual
         allTolerable = True
@@ -431,8 +434,11 @@ def finiteDifferencePotentialSolver(h, relaxation):
     result = {'h':h,'relaxation':relaxation,'iteratations': iterationNumber, 
               'potentials': nextGuess, 'x,y':nextGuess[iCoord, jCoord]}
     return result
+
 if __name__ == '__main__':
     result = finiteDifferencePotentialSolver(0.01, 1.5)
     result2 = finiteDifferencePotentialSolver(0.01, 0.4)
+    np.testing.assert_allclose(result['x,y'],[3.567])
     np.testing.assert_allclose(result['potentials'], result2['potentials'])
+    
     pass
