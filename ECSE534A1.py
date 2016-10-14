@@ -334,7 +334,10 @@ def finiteDifferencePotentialSolver(h, relaxation):
             |   |
             --e--
     where c and e are Neuman boundaries and the rest are dirchlet. Note, i, j = (0,0)
-    starts in the lower left corner.
+    starts in the lower left corner. Note, this formulation uses the SOR method
+    :param h: The mesh spacing
+    :param relaxation: The relaxation factor
+    Returns a dictionary of results
     '''
     xCoord = 0.1-0.06 # Has equivalent potential to x = 0.06
     yCoord = 0.1-0.04 # Has the equivalent potentail to y = 0.04
@@ -487,8 +490,113 @@ def meshSizeTesting():
     plt.show()
     return
 
+def finiteDifferenceJacobi(h):
+    '''Solves for a set of potentials using finite difference approach.
+    By exploiting symmetry, the following region is considered
+    ----b--------
+    |           |
+    c           d
+    |---a---|   |
+            f   |
+            |   |
+            --e--
+    where c and e are Neuman boundaries and the rest are dirchlet. Note, i, j = (0,0)
+    starts in the lower left corner. Note, this formulation uses the Jacobi method.
+    :param h: The size of the mesh spacing
+    Returns a dictionary
+    '''
+    xCoord = 0.1-0.06 # Has equivalent potential to x = 0.06
+    yCoord = 0.1-0.04 # Has the equivalent potentail to y = 0.04
+    iCoord = int(xCoord // h)
+    jCoord = int(yCoord // h)
+    maxTries = 1000
+    height = 0.02+0.08
+    width = 0.06+0.04
+    innerConductorVoltage = 10
+    outerConductorVoltage = 0
+    n = int(width//h)
+    m = int(height//h)
+    corner = (int(0.04//h), int(0.02//h))
+
+    potentialMatrix = np.zeros((n,m),dtype=np.float)
+    #Populate the matrix with the boundary conditions
+    for i in np.arange(n):
+        for j in np.arange(m):
+            if i <= corner[0] and j <= corner[1]:
+                potentialMatrix[i,j] = innerConductorVoltage #Side f includes corner
+            if i == n-1:
+                potentialMatrix[i,j] = outerConductorVoltage #Side d
+            if j == m-1:
+                potentialMatrix[i,j] = outerConductorVoltage #Side b
+            if j == corner[1] and i < corner[0]:
+                potentialMatrix[i,j] = innerConductorVoltage #Side a excludes corner
+
+    residualNorm = 1
+    iterationNumber = 0
+    tolerance = 10**(-5)
+    allTolerable = False
+    while(not allTolerable):
+        for i in np.arange(n-1): #Do not include outer boundary
+            for j in np.arange(m-1): #Do not include outer boundary
+                if i <= corner[0] and j <= corner[1]:
+                    pass #Do nothing as it is outside the problem domain
+                elif i == 0:
+                    if j > corner[1]:
+                        #Handle Neuman boundary on c
+                        potentialMatrix[i,j] = ( (1/4)*(2*potentialMatrix[i+1,j]+
+                                                potentialMatrix[i,j+1] +
+                                                potentialMatrix[i, j-1]) )
+                elif j == 0: 
+                    if i > corner[0]:
+                        #Handle Neuman boundary on e
+                        potentialMatrix[i,j] = ( (1/4)*(potentialMatrix[i+1,j]+ 
+                                                potentialMatrix[i-1,j] +
+                                                2*potentialMatrix[i,j+1]) )
+                else:
+                    #Handle regular free nodes in the problem domain
+                    potentialMatrix[i,j] = ( (1/4)*(potentialMatrix[i+1,j]+ 
+                                            potentialMatrix[i-1,j] +
+                                            potentialMatrix[i,j+1] + 
+                                            potentialMatrix[i, j-1]) )
+        #compute residual
+        allTolerable = True
+        for i in np.arange(n-1): #Do not include outer boundary
+            for j in np.arange(m-1):
+                residual = 1
+                if i <= corner[0] and j <= corner[1]:
+                    residual = tolerance
+                    pass
+                elif i == 0:
+                    if j >corner[1]:
+                        residual = (2*potentialMatrix[i+1,j] + 
+                                    potentialMatrix[i, j+1]+ 
+                                    potentialMatrix[i, j-1]-
+                                    4*potentialMatrix[i,j])
+                elif j == 0:
+                    if i >corner[0]:
+                        residual = (potentialMatrix[i+1,j] + 
+                                    potentialMatrix[i-1, j]+ 
+                                    2*potentialMatrix[i, j+1]-
+                                    4*potentialMatrix[i,j])
+                else:
+                    residual = (potentialMatrix[i+1,j] + 
+                                        potentialMatrix[i-1, j]+ 
+                                        potentialMatrix[i, j+1]+ 
+                                        potentialMatrix[i, j-1]-
+                                        4*potentialMatrix[i,j])
+                if abs(residual) > tolerance:
+                    allTolerable = False
+        iterationNumber += 1
+        if iterationNumber == maxTries:
+            raise Exception(
+                'You have exceeded the maximum number of iterations {}'.format(maxTries))
+    result = {'h':h,'iterations': iterationNumber, 
+              'potentials': potentialMatrix, 'x,y':potentialMatrix[iCoord, jCoord]}
+    return result
+
 if __name__ == '__main__':
-    meshSizeTesting()
+    #meshSizeTesting()
+    result = finiteDifferenceJacobi(0.01)
     #relaxationTesting()
     #result = finiteDifferencePotentialSolver(0.01, 1.5)
     #result2 = finiteDifferencePotentialSolver(0.01, 0.4)
