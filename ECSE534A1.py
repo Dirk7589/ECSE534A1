@@ -504,7 +504,7 @@ def meshSizeTesting():
     plt.grid(True)
     plt.ylim([0,10])
     plt.plot(meshInverse, x_y_SOR, '-o')
-    plt.savefig('sor_mesh_potential.png')
+    plt.savefig('sor_mesh_potential')
    
     #Graph of iterations and inverse mesh
     plt.clf()
@@ -515,7 +515,7 @@ def meshSizeTesting():
     plt.grid(True)
     plt.ylim([0,iterations_SOR[len(iterations_SOR)-1]])
     plt.plot(meshInverse, iterations_SOR, '-o')
-    plt.savefig('sor_mesh_iterations.png')
+    plt.savefig('sor_mesh_iterations')
     
     
     #Graph of potential and inverse mesh
