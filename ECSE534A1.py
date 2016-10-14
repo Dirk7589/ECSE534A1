@@ -322,8 +322,8 @@ def finiteDifferencePotentialSolver(h, relaxation):
     '''
     xCoord = 0.1-0.06 # Has equivalent potential to x = 0.06
     yCoord = 0.1-0.04 # Has the equivalent potentail to y = 0.04
-    iCoord = xCoord // h
-    jCoord = yCoord // h
+    iCoord = int(xCoord // h)
+    jCoord = int(yCoord // h)
     maxTries = 1000
     height = 0.02+0.08
     width = 0.06+0.04
@@ -349,6 +349,7 @@ def finiteDifferencePotentialSolver(h, relaxation):
     residualNorm = 1
     iterationNumber = 0
     tolerance = 10**(-5)
+    previousGuess = np.copy(potentialMatrix)
     nextGuess = np.copy(potentialMatrix)
     allTolerable = False
     while(not allTolerable):
@@ -359,24 +360,25 @@ def finiteDifferencePotentialSolver(h, relaxation):
                 elif i == 0:
                     if j > corner[1]:
                         #Handle Neuman boundary on c
-                        nextGuess[i,j] = ( (1-relaxation)*nextGuess[i,j] + 
-                                          (relaxation/4)*(2*nextGuess[i+1,j]+
-                                                nextGuess[i,j+1] +
+                        nextGuess[i,j] = ( (1-relaxation)*previousGuess[i,j] + 
+                                          (relaxation/4)*(2*previousGuess[i+1,j]+
+                                                previousGuess[i,j+1] +
                                                 nextGuess[i, j-1]) )
                 elif j == 0: 
                     if i > corner[0]:
                         #Handle Neuman boundary on e
-                        nextGuess[i,j] = ( (1-relaxation)*nextGuess[i,j] +
-                                          (relaxation/4)*(nextGuess[i+1,j]+ 
+                        nextGuess[i,j] = ( (1-relaxation)*previousGuess[i,j] +
+                                          (relaxation/4)*(previousGuess[i+1,j]+ 
                                                 nextGuess[i-1,j] +
-                                                2*nextGuess[i,j+1]) )
+                                                2*previousGuess[i,j+1]) )
                 else:
                     #Handle regular free nodes in the problem domain
-                    nextGuess[i,j] = ( (1-relaxation)*nextGuess[i,j] +
-                                            (relaxation/4)*(nextGuess[i+1,j]+ 
+                    nextGuess[i,j] = ( (1-relaxation)*previousGuess[i,j] +
+                                            (relaxation/4)*(previousGuess[i+1,j]+ 
                                             nextGuess[i-1,j] +
-                                            nextGuess[i,j+1] + 
+                                            previousGuess[i,j+1] + 
                                             nextGuess[i, j-1]) )
+        previousGuess = nextGuess
 
         #Check if boundaries have been respected
         for i in np.arange(n):
