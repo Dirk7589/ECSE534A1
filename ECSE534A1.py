@@ -17,6 +17,14 @@ def initLogger():
     return logger
 logger =  initLogger()
 
+def truncateFloat(f, n):
+    '''Truncates/pads a float f to n decimal places without rounding'''
+    s = '{}'.format(f)
+    if 'e' in s or 'E' in s:
+        return '{0:.{1}f}'.format(f, n)
+    i, p, d = s.partition('.')
+    return '.'.join([i, (d+'0'*n)[:n]])
+
 def createSPDMatrices(lowerBound, upperBound):
     """Computes a series of test matrices for Choleski algorithm
     :param lowerBound: dimension of smallest test matrix
@@ -343,7 +351,7 @@ def finiteDifferencePotentialSolver(h, relaxation):
     yCoord = 0.1-0.04 # Has the equivalent potentail to y = 0.04
     iCoord = int(xCoord // h)
     jCoord = int(yCoord // h)
-    maxTries = 1000
+    maxTries = 10000
     height = 0.02+0.08
     width = 0.06+0.04
     innerConductorVoltage = 10
@@ -464,8 +472,8 @@ def meshSizeTesting():
     x_y_Jacobi = []
     iterations_Jacobi = []
     meshInverse = []
-    for i in range(4):
-        nextMeshSize = meshSizes[len(meshSizes)-1] / 1.5
+    for i in range(3):
+        nextMeshSize = meshSizes[len(meshSizes)-1] / 2
         meshSizes.append(nextMeshSize)
     for meshSize in meshSizes:
         meshInverse.append(1/meshSize)
@@ -479,39 +487,53 @@ def meshSizeTesting():
         result = finiteDifferenceJacobi(meshSize)
         x_y_Jacobi.append(result['x,y'])
         iterations_Jacobi.append(result['iterations'])
-        print('Jacobi Phi(0.04, 0.06): {} | 1/h {}'.format(result['x,y'],
+        print('Jacobi Phi(0.04, 0.06): {} | 1/h: {}'.format(result['x,y'],
                                                     1/meshSize))
-        print('Jacobi Iterations: {} | 1/h {}'.format(result['iterations'],
+        print('Jacobi Iterations: {} | 1/h: {}'.format(result['iterations'],
                                                     1/meshSize))
     #Graph of potential and inverse mesh
-    plt.figure(1)
     plt.title('Potential Phi(0.04,0.06) versus 1/meshSize (h) using SOR')
     plt.xlabel('1/meshSize (h)')
     plt.ylabel('Potential Phi(0.04,0.06) (V)')
-    plt.plot(meshInverse, x_y_SOR)
-    
-    #Graph of iterations and inverse mesh    
-    plt.figure(2)
+    plt.grid(True)
+    plt.ylim([0,10])
+    plt.plot(meshInverse, x_y_SOR, '-o')
+    plt.savefig('sor_mesh_potential.png')
+   
+    #Graph of iterations and inverse mesh
+    plt.clf()
+    plt.cla()    
     plt.title('Number of iterations versus 1/meshSize (h) using SOR')
     plt.xlabel('1/meshSize (h)')
     plt.ylabel('Number of itereations')
-    plt.plot(meshInverse, iterations_SOR)
-    plt.show()
-
+    plt.grid(True)
+    plt.ylim([0,iterations_SOR[len(iterations_SOR)-1]])
+    plt.plot(meshInverse, iterations_SOR, '-o')
+    plt.savefig('sor_mesh_iterations.png')
+    
+    
     #Graph of potential and inverse mesh
-    plt.figure(3)
+    plt.clf()
+    plt.cla()
     plt.title('Potential Phi(0.04,0.06) versus 1/meshSize (h) using Jacobi')
     plt.xlabel('1/meshSize (h)')
     plt.ylabel('Potential Phi(0.04,0.06) (V)')
-    plt.plot(meshInverse, x_y_Jacobi)
+    plt.grid(True)
+    plt.ylim([0,10])
+    plt.plot(meshInverse, x_y_Jacobi, '-o')
+    plt.savefig('jacobi_mesh_potential')
     
-    #Graph of iterations and inverse mesh    
-    plt.figure(4)
+    #Graph of iterations and inverse mesh
+    plt.clf()
+    plt.cla()    
     plt.title('Number of iterations versus 1/meshSize (h) using Jacobi')
     plt.xlabel('1/meshSize (h)')
     plt.ylabel('Number of itereations')
-    plt.plot(meshInverse, iterations_Jacobi)
-    plt.show()
+    plt.grid(True)
+    plt.ylim([0,iterations_Jacobi[len(iterations_Jacobi)-1]])
+    plt.plot(meshInverse, iterations_Jacobi, '-o')
+    plt.savefig('jacobi_mesh_iterations')
+    
     return
 
 def finiteDifferenceJacobi(h):
@@ -533,7 +555,7 @@ def finiteDifferenceJacobi(h):
     yCoord = 0.1-0.04 # Has the equivalent potentail to y = 0.04
     iCoord = int(xCoord // h)
     jCoord = int(yCoord // h)
-    maxTries = 1000
+    maxTries = 10000
     height = 0.02+0.08
     width = 0.06+0.04
     innerConductorVoltage = 10
@@ -622,8 +644,8 @@ if __name__ == '__main__':
     meshSizeTesting()
     #result = finiteDifferenceJacobi(0.01)
     #relaxationTesting()
-    #result = finiteDifferencePotentialSolver(0.01, 1.5)
-    #result2 = finiteDifferencePotentialSolver(0.01, 0.4)
+    #result = finiteDifferencePotentialSolver(0.0025, 1.5)
+    #result2 = finiteDifferencePotentialSolv~   er(0.01, 0.4)
     #np.testing.assert_allclose(result['x,y'],[3.567])
     #np.testing.assert_allclose(result['potentials'], result2['potentials'])
     
