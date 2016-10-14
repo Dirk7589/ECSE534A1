@@ -508,7 +508,7 @@ def meshSizeTesting():
     plt.grid(True)
     plt.ylim([outerConductor, innerConductor]) #Display y over a meaningful range
     plt.plot(meshInverse, x_y_SOR, '-o')
-    plt.savefig('sor_mesh_potential')
+    plt.savefig('sor_mesh_potential.pdf', format='pdf')
    
     #Graph of iterations and inverse mesh
     plt.clf()
@@ -519,7 +519,7 @@ def meshSizeTesting():
     plt.grid(True)
     plt.ylim([0,iterations_SOR[len(iterations_SOR)-1]])
     plt.plot(meshInverse, iterations_SOR, '-o')
-    plt.savefig('sor_mesh_iterations')
+    plt.savefig('sor_mesh_iterations.pdf', format='pdf')
     
     
     #Graph of potential and inverse mesh
@@ -531,7 +531,7 @@ def meshSizeTesting():
     plt.grid(True)
     plt.ylim([outerConductor, innerConductor]) #Display y over a meaningful range
     plt.plot(meshInverse, x_y_Jacobi, '-o')
-    plt.savefig('jacobi_mesh_potential')
+    plt.savefig('jacobi_mesh_potential.pdf', format='pdf')
     
     #Graph of iterations and inverse mesh
     plt.clf()
@@ -542,7 +542,7 @@ def meshSizeTesting():
     plt.grid(True)
     plt.ylim([0,iterations_Jacobi[len(iterations_Jacobi)-1]])
     plt.plot(meshInverse, iterations_Jacobi, '-o')
-    plt.savefig('jacobi_mesh_iterations')
+    plt.savefig('jacobi_mesh_iterations.pdf', format='pdf')
     
     return
 
@@ -651,9 +651,9 @@ def finiteDifferenceJacobi(h):
     return result
 
 if __name__ == '__main__':
-    #meshSizeTesting()
+    meshSizeTesting()
     #result = finiteDifferenceJacobi(0.01)
-    relaxationTesting()
+    #relaxationTesting()
     #result = finiteDifferencePotentialSolver(0.01, 1.19)
     #result2 = finiteDifferencePotentialSolv~   er(0.01, 0.4)
     #np.testing.assert_allclose(result['x,y'],[3.567])
