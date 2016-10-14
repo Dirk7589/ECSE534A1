@@ -431,11 +431,33 @@ def finiteDifferencePotentialSolver(h, relaxation):
         if iterationNumber == maxTries:
             raise Exception(
                 'You have exceeded the maximum number of iterations {}'.format(maxTries))
-    result = {'h':h,'relaxation':relaxation,'iteratations': iterationNumber, 
+    result = {'h':h,'relaxation':relaxation,'iterations': iterationNumber, 
               'potentials': nextGuess, 'x,y':nextGuess[iCoord, jCoord]}
     return result
 
+def relaxationTesting():
+    h = 0.02
+    relaxations = np.linspace(1.1,2.0,num=10, endpoint=False) #Generate w
+    iterations = []
+    for relaxation in relaxations:
+        result = finiteDifferencePotentialSolver(h, relaxation) #Compute finite diff
+        #Tabluate the results
+        print("Relaxation: {} | Iterations: {} | Phi(0.06,0.04): {}".format(
+            result['relaxation'],result['iterations'],result['x,y']))
+        iterations.append(result['iterations'])
+    #Plot the resulting iterations and w
+    plt.xlabel('Relaxation factor (w)')
+    plt.ylabel('Number of iterations')
+    plt.title('Number of iterations vs relaxation factor (w)')
+    plt.grid(True)
+    plt.plot(relaxations, iterations)
+    plt.show()
+
+def meshSizeTesting():
+    relaxation = 1.19 #Chosen based on the relaxation testing
+
 if __name__ == '__main__':
+    relaxationTesting()
     result = finiteDifferencePotentialSolver(0.01, 1.5)
     result2 = finiteDifferencePotentialSolver(0.01, 0.4)
     np.testing.assert_allclose(result['x,y'],[3.567])
