@@ -453,7 +453,10 @@ def relaxationTesting():
         result = finiteDifferencePotentialSolver(h, relaxation) #Compute finite diff
         #Tabluate the results
         print("Relaxation: {} | Iterations: {} | Phi(0.06,0.04): {}".format(
-            result['relaxation'],result['iterations'],result['x,y']))
+            truncateFloat(result['relaxation'],3),
+            result['iterations'],
+            truncateFloat(result['x,y'], 3)))
+
         iterations.append(result['iterations'])
     #Plot the resulting iterations and w
     plt.xlabel('Relaxation factor (w)')
@@ -648,9 +651,9 @@ def finiteDifferenceJacobi(h):
     return result
 
 if __name__ == '__main__':
-    meshSizeTesting()
+    #meshSizeTesting()
     #result = finiteDifferenceJacobi(0.01)
-    #relaxationTesting()
+    relaxationTesting()
     #result = finiteDifferencePotentialSolver(0.01, 1.19)
     #result2 = finiteDifferencePotentialSolv~   er(0.01, 0.4)
     #np.testing.assert_allclose(result['x,y'],[3.567])
