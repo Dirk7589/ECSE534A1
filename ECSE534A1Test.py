@@ -1,7 +1,7 @@
 ﻿import unittest
 import ECSE534A1 as methods
 import numpy as np
-
+import os
 class Test_test1(unittest.TestCase):
     def test_createTestMatrix(self):
         matrix_size = 2
@@ -134,5 +134,10 @@ class Test_test1(unittest.TestCase):
         result = methods.meshWriter(2, 2)
         np.testing.assert_allclose(result[0], expectedIncidence)
 
+    def test_relaxationTest(self):
+        methods.relaxationTesting()
+    def test_meshSizeTesting(self):
+        methods.meshSizeTesting()
+        
 if __name__ == '__main__':
     unittest.main()
