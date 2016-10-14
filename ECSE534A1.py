@@ -354,8 +354,10 @@ def finiteDifferencePotentialSolver(h, relaxation):
     maxTries = 10000
     height = 0.02+0.08
     width = 0.06+0.04
-    innerConductorVoltage = 10
+    innerConductorVoltage = 110
     outerConductorVoltage = 0
+
+    #Compute the n and m indexes
     n = int(width//h)
     m = int(height//h)
     corner = (int(0.04//h), int(0.02//h))
@@ -406,9 +408,6 @@ def finiteDifferencePotentialSolver(h, relaxation):
                                             previousGuess[i,j+1] + 
                                             nextGuess[i, j-1]) )
         previousGuess = nextGuess
-
-        #Check if boundaries have been respected
-        boundaryCheck(corner, innerConductorVoltage, m, n, outerConductorVoltage, potentialMatrix)
                      
         #compute residual
         allTolerable = True
@@ -467,6 +466,8 @@ def relaxationTesting():
 def meshSizeTesting():
     relaxation = 1.19 #Chosen based on the relaxation testing
     meshSizes = [0.02] #The starting mesh size
+    outerConductor = 0
+    innerConductor = 110
     x_y_SOR = []
     iterations_SOR = []
     x_y_Jacobi = []
@@ -502,7 +503,7 @@ def meshSizeTesting():
     plt.xlabel('1/meshSize (h)')
     plt.ylabel('Potential Phi(0.04,0.06) (V)')
     plt.grid(True)
-    plt.ylim([0,10])
+    plt.ylim([outerConductor, innerConductor]) #Display y over a meaningful range
     plt.plot(meshInverse, x_y_SOR, '-o')
     plt.savefig('sor_mesh_potential')
    
@@ -525,7 +526,7 @@ def meshSizeTesting():
     plt.xlabel('1/meshSize (h)')
     plt.ylabel('Potential Phi(0.04,0.06) (V)')
     plt.grid(True)
-    plt.ylim([0,10])
+    plt.ylim([outerConductor, innerConductor]) #Display y over a meaningful range
     plt.plot(meshInverse, x_y_Jacobi, '-o')
     plt.savefig('jacobi_mesh_potential')
     
@@ -564,7 +565,7 @@ def finiteDifferenceJacobi(h):
     maxTries = 10000
     height = 0.02+0.08
     width = 0.06+0.04
-    innerConductorVoltage = 10
+    innerConductorVoltage = 110
     outerConductorVoltage = 0
     n = int(width//h)
     m = int(height//h)
@@ -650,7 +651,7 @@ if __name__ == '__main__':
     meshSizeTesting()
     #result = finiteDifferenceJacobi(0.01)
     #relaxationTesting()
-    #result = finiteDifferencePotentialSolver(0.0025, 1.5)
+    #result = finiteDifferencePotentialSolver(0.01, 1.19)
     #result2 = finiteDifferencePotentialSolv~   er(0.01, 0.4)
     #np.testing.assert_allclose(result['x,y'],[3.567])
     #np.testing.assert_allclose(result['potentials'], result2['potentials'])
