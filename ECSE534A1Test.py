@@ -90,12 +90,6 @@ class Test_test1(unittest.TestCase):
         #Run
         result = methods.choleskiSolverSparse(inputMatrix, initialVector, bandwidth)
         #Assert
-        lowerTriangularMatrix = np.tril(inputMatrix)
-        #Reconstruct the original matrix
-        resultingMatrix = lowerTriangularMatrix.dot(lowerTriangularMatrix.T)
-        #Assert the decomposition and solution are correct
-        np.testing.assert_allclose(resultingMatrix, testMatrix, 
-                                   err_msg='Incorrect decomposition matrix') 
         np.testing.assert_allclose(result, solutionVector, 
                                    err_msg='Incorrect solution vector') 
 

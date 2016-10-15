@@ -114,37 +114,30 @@ def choleskiSolverSparse(inputMatrix, initialValueVector, halfBandwidth):
 
     rowLength = inputMatrix.shape[0]
     columnLength = inputMatrix.shape[1]
-    
+    L = np.zeros_like(inputMatrix)
     for j in np.arange(columnLength):
         if inputMatrix[j, j] <= 0:
             raise Exception("invalid value in matrix, it is not SPD")
         
         sqrtTerm = np.sqrt(inputMatrix[j,j])
-        inputMatrix[j,j] = sqrtTerm
-        initialValueVector[j] = initialValueVector[j] / inputMatrix[j,j]
+        L[j,j] = sqrtTerm
+        initialValueVector[j] = initialValueVector[j]/L[j,j]
 
-        bandwidthLimit = j + halfBandwidth + 1
-        if bandwidthLimit > columnLength:
-            bandwidthLimit = columnLength #Ensure we don't index past the bottom
-
-        for i in np.arange(j+1, bandwidthLimit): #Iterate over those items in the band
-            value = inputMatrix[i,j]
-            inputMatrix[i,j] = inputMatrix[i,j] / inputMatrix[j,j]
-            initialValueVector[i] = initialValueVector[i] - \
-                (inputMatrix[i,j]*initialValueVector[j])
+        for i in np.arange(j+1, rowLength): #Iterate over those items in the band
+            L[i,j] = inputMatrix[i,j] / L[j,j]
+            initialValueVector[i] = initialValueVector[i] - L[i,j]*initialValueVector[j]
             for k in np.arange(j+1, i+1):
-                inputMatrix[i,k] = inputMatrix[i,k] - inputMatrix[i,j]*inputMatrix[k,j]
+                inputMatrix[i,k] = inputMatrix[i,k] - L[i,j]*L[k,j]
+
     
-    resultVector = np.zeros_like(initialValueVector)
-    n = resultVector.shape[0]
-    i = n - 1
-    while(i >= 0):
-        sum = 0
+    n = initialValueVector.shape[0]
+    
+    for i in np.arange(n-1, -1, -1):
         for j in np.arange(i+1, n):
-            sum += (inputMatrix[j,i]*resultVector[j])
-        resultVector[i] = (initialValueVector[i] - sum) / inputMatrix[i,i]
-        i -= 1
-    return resultVector
+            initialValueVector[i] = initialValueVector[i] - L[j,i]*initialValueVector[j]
+        initialValueVector[i] = initialValueVector[i] / L[i,i]
+        
+    return initialValueVector
 
 def readLinearResistiveNetwork(fileName):
     '''Reads in a linear resistive network
