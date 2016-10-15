@@ -324,6 +324,7 @@ def runLinearResistiveMeshTests():
     nonSparseResults = solveMeshResistances(False)
     sparseResults = solveMeshResistances(True)
     sizeVReq = [[],[]]
+    sizeVTime= [[],[]]
     for result in nonSparseResults:
         print("Non sparse choleski results")
         print("Mesh size: {}x{} | Computation time: {} | Equivalent R (ohms): {}".format(
@@ -332,16 +333,17 @@ def runLinearResistiveMeshTests():
             truncateFloat(result['req'], 4)))
         sizeVReq[0].append(result['size'])
         sizeVReq[1].append(result['req'])
-
-    sizeVTime = [[],[]]
+        sizeVTime[0].append(result['size'])
+        sizeVTime[1].append(result['time'])
+    sizeVTimeSparse = [[],[]]
     for result in sparseResults:
         print("Sparse choleski results")
         print("Mesh size: {}x{} | Computation time: {} | Equivalent R (ohms): {}".format(
             result['size'],result['size'],
             truncateFloat(result['time'], 6),
             truncateFloat(result['req'], 4)))
-        sizeVTime[0].append(result['size'])
-        sizeVTime[1].append(result['time'])
+        sizeVTimeSparse[0].append(result['size'])
+        sizeVTimeSparse[1].append(result['time'])
     
     plt.title('Equivalent resistance (Req) vs mesh size (N)')
     plt.xlabel('N')
@@ -350,11 +352,16 @@ def runLinearResistiveMeshTests():
     plt.plot(sizeVReq[0], sizeVReq[1],'-o')
     plt.savefig('q2d.pdf',format='pdf')
 
+    plt.clf()
     plt.title('Computation time vs mesh size (N)')
     plt.xlabel('N')
     plt.ylabel('Computation time')
+    plt.ylim([-0.2,1])
+    
     plt.grid(True)
-    plt.plot(sizeVTime[0], sizeVTime[1],'-o')
+    fig1 = plt.plot(sizeVTime[0], sizeVTime[1], '-ro', label='Non sparse results')
+    fig2= plt.plot(sizeVTimeSparse[0], sizeVTimeSparse[1],'-o', label='Sparse results')
+    plt.legend(loc='upper left')
     plt.savefig('q2c.pdf',format='pdf')
 
     return [nonSparseResults, sparseResults]
