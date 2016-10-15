@@ -120,6 +120,23 @@ class Test_test1(unittest.TestCase):
             #assert
             np.testing.assert_allclose(result, expected, err_msg=error_message)
 
+    def test_runLinearResistiveMeshTests(self):
+        #setup
+        nonSparseResults = []
+        sparseResults = []
+
+        #run
+        results = methods.runLinearResistiveMeshTests()
+
+        nonSparseResults = results[0]
+        sparseResults = results[1]
+        #assert
+        for i in np.arange(len(nonSparseResults)):
+            np.testing.assert_allclose(nonSparseResults[i]['req'], 
+                                       sparseResults[i]['req'])
+
+
+
     def test_meshWriter(self):
         #setup
         expectedIncidence = np.array([[1,1,0,0,1],[-1,0,1,0,0],[0,-1,0,1,0],[0,0,-1,-1,-1]], 

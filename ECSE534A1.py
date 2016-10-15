@@ -357,6 +357,8 @@ def runLinearResistiveMeshTests():
     plt.plot(sizeVTime[0], sizeVTime[1],'-o')
     plt.savefig('q2c.pdf',format='pdf')
 
+    return [nonSparseResults, sparseResults]
+
 def boundaryCheck(corner, innerConductorVoltage, m, n, outerConductorVoltage, potentialMatrix):
     for i in np.arange(n):
         for j in np.arange(m):
