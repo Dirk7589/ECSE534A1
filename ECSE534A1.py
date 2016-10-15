@@ -98,6 +98,12 @@ def choleskiSolver(inputMatrix, initialValueVector):
     return resultVector
 
 def choleskiSolverSparse(inputMatrix, initialValueVector, halfBandwidth):
+    """"Solves a matrix problem inputMatrix*x=initialValueVector using choleski
+    decomposition. A sparse varient using bandwidth is used
+    :param inputMatrx: The square SPD input matrix
+    :param initialValueVector: The vector containing the initial conditions
+    Returns the resulting x vector
+    """
     #input validation
     if inputMatrix.dtype == np.integer:
         logger.warning('inputMatrix is of type integer.\
@@ -141,7 +147,10 @@ def choleskiSolverSparse(inputMatrix, initialValueVector, halfBandwidth):
     return resultVector
 
 def readLinearResistiveNetwork(fileName):
-    
+    '''Reads in a linear resistive network
+    :param fileName the csv file containing the network to solve
+    Returns the A, J, E, and R from the file
+    '''
     A = []
     J = []
     E = []
@@ -192,6 +201,10 @@ def readLinearResistiveNetwork(fileName):
             np.array(R,dtype=np.float).T]
 
 def solveLinearResistiveNetwork(fileName):
+    '''Solves a linear resistive network from a file
+    :param fileName: The file containing the resistive network
+    Returns the solution vector of nodal voltages for the network
+    '''
     elements = readLinearResistiveNetwork(fileName)
     A = elements[0]
     J = elements [1]
@@ -273,13 +286,16 @@ def meshWriter(n, m):
     return result
 
 def solveMeshResistances(sparse=False):
-    meshSizes = np.arange(2,4)
+    '''Solves a series of linear resistive mesh problems of various size
+    :param sparse=False When True, the sparse version of Cholesky is used
+    Returns a list of dictionaries that contain the size, time and req'''
+    meshSizes = np.arange(2,34,4)
     results = []
     for meshSize in meshSizes:
         deltaTime = 0
         equivalentResistance = 0
         result = {'size':0, 'time':0, 'req':[]}
-        elements = meshWriter(meshSize, 2*meshSize)
+        elements = meshWriter(meshSize, meshSize)
         A = elements[0]
         
         A = np.delete(A,len(A)-1, 0)
@@ -307,13 +323,23 @@ def solveMeshResistances(sparse=False):
     return results #Return all the results
 
 def runLinearResistiveMeshTests():
+
     nonSparseResults = solveMeshResistances(False)
-    sparseResults = solveMeshResistances(True)
+    #sparseResults = solveMeshResistances(True)
     sizeVReq = [[],[]]
     for result in nonSparseResults:
-        sizeVReq[0] = result['size']
-        sizeVReq[1] = result['req']
-    plt.plot(sizeVReq[0], sizeVReq[1])
+        print("Mesh size: {}x{} | Computation time: {}".format(
+            result['size'],result['size'],result['time']))
+        sizeVReq[0].append(result['size'])
+        sizeVReq[1].append(result['req'])
+
+    
+    plt.title('Equivalent resistance (Req) vs mesh size (N)')
+    plt.xlabel('N')
+    plt.ylabel('Req (ohms)')
+    plt.grid(True)
+    plt.plot(sizeVReq[0], sizeVReq[1],'-o')
+    plt.savefig('q2d.pdf',format='pdf')
 
 def boundaryCheck(corner, innerConductorVoltage, m, n, outerConductorVoltage, potentialMatrix):
     for i in np.arange(n):
@@ -660,5 +686,5 @@ def meshSizeTesting():
     return
 
 if __name__ == '__main__':
-    solveMeshResistances(True)
+
     pass
