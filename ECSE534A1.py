@@ -222,11 +222,11 @@ def meshWriter(n, m):
     result = []
     numberOfNodes = n * m
     numberofBranches = n*(m-1) + (n-1)*m
-    incidenceMatrix = np.zeros((numberOfNodes,numberofBranches))
-    E = np.zeros(numberofBranches)
-    J = np.zeros(numberofBranches)
-    R = np.ones(numberofBranches)
-    R = R*1000
+    incidenceMatrix = np.zeros((numberOfNodes,numberofBranches+1))
+    E = np.zeros(numberofBranches + 1)
+    J = np.zeros(numberofBranches + 1)
+    R = np.ones(numberofBranches + 1)
+    R = R*1000 #Set the resistance to 1000 ohms
 
     currentBranchElement = 0 #Note the current branch element
     for i in np.arange(n): #Loop through the rows
@@ -260,15 +260,12 @@ def meshWriter(n, m):
                 currentBranchElement = currentBranchElement + 1 #Handled one branch
             
             else:
-                #incidenceMatrix[0, currentBranchElement - 1] = 1 
-                #incidenceMatrix[currentNodeIndex, currentBranchElement - 1] = -1
-                pass
-    lowerLeftNodeIndex = m*(n-1)
-    lowerLeftNode = incidenceMatrix[lowerLeftNodeIndex]
-    for j in lowerLeftNode:
-        if lowerLeftNode[j] != 0:
-            incidenceMatrix[m-1,j] = lowerLeftNode[j]
-    np.delete(incidenceMatrix, lowerLeftNodeIndex)
+                #Add a current source to the system
+                incidenceMatrix[0, currentBranchElement] = 1 
+                incidenceMatrix[currentNodeIndex, currentBranchElement] = -1
+                
+    J[currentBranchElement] = 1 #Add a current source of 1 Amp
+    R[currentBranchElement] = 10**6 #Give the current source a large resistance
     result.append(incidenceMatrix)
     result.append(E)
     result.append(J)
@@ -276,14 +273,16 @@ def meshWriter(n, m):
     return result
 
 def solveMeshResistances(sparse=False):
-    meshSizes = np.linspace(2,15,1)
+    meshSizes = np.arange(2,4)
     results = []
     for meshSize in meshSizes:
         deltaTime = 0
         equivalentResistance = 0
         result = {'size':0, 'time':0, 'req':[]}
-        elements = meshWriter(meshSize, meshSize)
+        elements = meshWriter(meshSize, 2*meshSize)
         A = elements[0]
+        
+        A = np.delete(A,len(A)-1, 0)
         E = elements [1]
         J = elements[2]
         Y = np.diag(1/elements[3])
@@ -297,14 +296,15 @@ def solveMeshResistances(sparse=False):
         else:
             solutionVector = choleskiSolver(inputMatrix, initialVector)
         #Compute Req
-
+        equivalentResistance = solutionVector[0]
         deltaTime = time.time() - startTime #end timing
         #Assign results
         result['size'] = meshSize
         result['time'] = deltaTime
         result['req'] = equivalentResistance
         results.append(result)
-    return result
+    
+    return results #Return all the results
 
 def runLinearResistiveMeshTests():
     nonSparseResults = solveMeshResistances(False)
@@ -660,5 +660,5 @@ def meshSizeTesting():
     return
 
 if __name__ == '__main__':
-    
+    solveMeshResistances(True)
     pass
