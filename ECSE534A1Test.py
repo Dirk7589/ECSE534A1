@@ -128,7 +128,7 @@ class Test_test1(unittest.TestCase):
 
     def test_meshWriter(self):
         #setup
-        expectedIncidence = np.array([[1,1,0,0],[-1,0,1,0],[0,-1,0,1],[0,0,-1,-1]], 
+        expectedIncidence = np.array([[1,1,0,0,1],[-1,0,1,0,0],[0,-1,0,1,0],[0,0,-1,-1,-1]], 
                                      dtype=np.float)
         #run
         result = methods.meshWriter(2, 2)
