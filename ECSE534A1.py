@@ -123,7 +123,11 @@ def choleskiSolverSparse(inputMatrix, initialValueVector, halfBandwidth):
         L[j,j] = sqrtTerm
         initialValueVector[j] = initialValueVector[j]/L[j,j]
 
-        for i in np.arange(j+1, rowLength): #Iterate over those items in the band
+        bandwidthLimit = j + halfBandwidth + 1
+        if bandwidthLimit > columnLength:
+            bandwidthLimit = columnLength #Ensure we don't index past the bottom
+
+        for i in np.arange(j+1, halfBandwidth): #Iterate over those items in the band
             L[i,j] = inputMatrix[i,j] / L[j,j]
             initialValueVector[i] = initialValueVector[i] - L[i,j]*initialValueVector[j]
             for k in np.arange(j+1, i+1):
@@ -318,9 +322,10 @@ def solveMeshResistances(sparse=False):
 def runLinearResistiveMeshTests():
 
     nonSparseResults = solveMeshResistances(False)
-    #sparseResults = solveMeshResistances(True)
+    sparseResults = solveMeshResistances(True)
     sizeVReq = [[],[]]
     for result in nonSparseResults:
+        print("Non sparse choleski results")
         print("Mesh size: {}x{} | Computation time: {} | Equivalent R (ohms): {}".format(
             result['size'],result['size'],
             truncateFloat(result['time'], 6),
@@ -328,6 +333,15 @@ def runLinearResistiveMeshTests():
         sizeVReq[0].append(result['size'])
         sizeVReq[1].append(result['req'])
 
+    sizeVTime = [[],[]]
+    for result in sparseResults:
+        print("Sparse choleski results")
+        print("Mesh size: {}x{} | Computation time: {} | Equivalent R (ohms): {}".format(
+            result['size'],result['size'],
+            truncateFloat(result['time'], 6),
+            truncateFloat(result['req'], 4)))
+        sizeVTime[0].append(result['size'])
+        sizeVTime[1].append(result['time'])
     
     plt.title('Equivalent resistance (Req) vs mesh size (N)')
     plt.xlabel('N')
@@ -335,6 +349,13 @@ def runLinearResistiveMeshTests():
     plt.grid(True)
     plt.plot(sizeVReq[0], sizeVReq[1],'-o')
     plt.savefig('q2d.pdf',format='pdf')
+
+    plt.title('Computation time vs mesh size (N)')
+    plt.xlabel('N')
+    plt.ylabel('Computation time')
+    plt.grid(True)
+    plt.plot(sizeVTime[0], sizeVTime[1],'-o')
+    plt.savefig('q2c.pdf',format='pdf')
 
 def boundaryCheck(corner, innerConductorVoltage, m, n, outerConductorVoltage, potentialMatrix):
     for i in np.arange(n):

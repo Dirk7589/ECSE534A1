@@ -85,7 +85,7 @@ class Test_test1(unittest.TestCase):
         initialVector = A.dot((J-Y.dot(E)))
         testMatrix = np.copy(inputMatrix) #Store original matrix
 
-        bandwidth = inputMatrix.shape[0]
+        bandwidth = A.shape[0]
 
         #Run
         result = methods.choleskiSolverSparse(inputMatrix, initialVector, bandwidth)
