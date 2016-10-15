@@ -133,6 +133,13 @@ class Test_test1(unittest.TestCase):
         #run
         result = methods.meshWriter(2, 2)
         np.testing.assert_allclose(result[0], expectedIncidence)
+    def test_MeshResistanceSolver(self):
+        sparseResult = methods.solveMeshResistances(True)
+        nonSparseResult = methods.solveMeshResistances(False)
+        for i in range(len(sparseResult)):
+            a = sparseResult[i]['req']
+            b = nonSparseResult[i]['req']
+            np.testing.assert_allclose(a,b)
 
     def test_relaxationTest(self):
         methods.relaxationTesting()
