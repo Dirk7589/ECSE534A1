@@ -289,7 +289,7 @@ def solveMeshResistances(sparse=False):
     '''Solves a series of linear resistive mesh problems of various size
     :param sparse=False When True, the sparse version of Cholesky is used
     Returns a list of dictionaries that contain the size, time and req'''
-    meshSizes = np.arange(2,34,4)
+    meshSizes = np.arange(2,15)
     results = []
     for meshSize in meshSizes:
         deltaTime = 0
