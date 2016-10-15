@@ -328,8 +328,10 @@ def runLinearResistiveMeshTests():
     #sparseResults = solveMeshResistances(True)
     sizeVReq = [[],[]]
     for result in nonSparseResults:
-        print("Mesh size: {}x{} | Computation time: {}".format(
-            result['size'],result['size'],result['time']))
+        print("Mesh size: {}x{} | Computation time: {} | Equivalent R (ohms): {}".format(
+            result['size'],result['size'],
+            truncateFloat(result['time'], 6),
+            truncateFloat(result['req'], 4)))
         sizeVReq[0].append(result['size'])
         sizeVReq[1].append(result['req'])
 
@@ -686,5 +688,5 @@ def meshSizeTesting():
     return
 
 if __name__ == '__main__':
-
+    runLinearResistiveMeshTests()
     pass
